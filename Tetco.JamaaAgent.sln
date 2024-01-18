@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{2914DB0C-07FE-445B-B886-687B8C1CF68C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{344BAA76-AF94-4230-A086-DDE77A98B543}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tetco.JamaaAgent.API", "Tetco.JamaaAgent.API", "{4FFFEE03-30CE-4052-8F8D-7915CD152CE4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Tetco.JamaaAgent.API\Domain\Domain.csproj", "{D9322314-D6F2-407E-9A18-5721E6158ABF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Tetco.JamaaAgent.API\Application\Application.csproj", "{70DBA2B1-A1AA-4231-A6DA-2D5AAA5A8B45}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Tetco.JamaaAgent.API\Infrastructure\Infrastructure.csproj", "{0FC6C45D-A4CE-4595-AF53-4D96B0ED94B4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "Tetco.JamaaAgent.API\API\API.csproj", "{53D5CF70-3BF5-448B-B370-F3F52A49A60E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JamaaAgent.API.Tests", "Tests\JamaaHub.Tests\JamaaAgent.API.Tests.csproj", "{D12DAFA5-501E-4204-89FF-D5093A7C680E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D9322314-D6F2-407E-9A18-5721E6158ABF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9322314-D6F2-407E-9A18-5721E6158ABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9322314-D6F2-407E-9A18-5721E6158ABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9322314-D6F2-407E-9A18-5721E6158ABF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70DBA2B1-A1AA-4231-A6DA-2D5AAA5A8B45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70DBA2B1-A1AA-4231-A6DA-2D5AAA5A8B45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70DBA2B1-A1AA-4231-A6DA-2D5AAA5A8B45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70DBA2B1-A1AA-4231-A6DA-2D5AAA5A8B45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0FC6C45D-A4CE-4595-AF53-4D96B0ED94B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FC6C45D-A4CE-4595-AF53-4D96B0ED94B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FC6C45D-A4CE-4595-AF53-4D96B0ED94B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FC6C45D-A4CE-4595-AF53-4D96B0ED94B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53D5CF70-3BF5-448B-B370-F3F52A49A60E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53D5CF70-3BF5-448B-B370-F3F52A49A60E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53D5CF70-3BF5-448B-B370-F3F52A49A60E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53D5CF70-3BF5-448B-B370-F3F52A49A60E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D12DAFA5-501E-4204-89FF-D5093A7C680E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D12DAFA5-501E-4204-89FF-D5093A7C680E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D12DAFA5-501E-4204-89FF-D5093A7C680E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D12DAFA5-501E-4204-89FF-D5093A7C680E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4FFFEE03-30CE-4052-8F8D-7915CD152CE4} = {344BAA76-AF94-4230-A086-DDE77A98B543}
+		{D9322314-D6F2-407E-9A18-5721E6158ABF} = {4FFFEE03-30CE-4052-8F8D-7915CD152CE4}
+		{70DBA2B1-A1AA-4231-A6DA-2D5AAA5A8B45} = {4FFFEE03-30CE-4052-8F8D-7915CD152CE4}
+		{0FC6C45D-A4CE-4595-AF53-4D96B0ED94B4} = {4FFFEE03-30CE-4052-8F8D-7915CD152CE4}
+		{53D5CF70-3BF5-448B-B370-F3F52A49A60E} = {4FFFEE03-30CE-4052-8F8D-7915CD152CE4}
+		{D12DAFA5-501E-4204-89FF-D5093A7C680E} = {2914DB0C-07FE-445B-B886-687B8C1CF68C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8BC91C28-C620-4263-80DA-DB17A582716A}
+	EndGlobalSection
+EndGlobal
