@@ -1,8 +1,5 @@
 ﻿using API.CrossCuttings.Authorization;
-using Application.Common.Exceptions;
-using Application.NaqelAgent.Queries.GetAllNewtemplates;
-using FluentValidation.Results;
-using MediatR;
+using Application.NaqelAgent.Queries.GetAllStudents;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -27,7 +24,7 @@ public sealed class AgentController : ApiControllerBase
     //}
 
     [HttpPost("GetAllStudents")]
-    public async Task<IActionResult> GetAllStudents(GetAllStudentssQuery students)
+    public async Task<IActionResult> GetAllStudents(GetAllStudentsQuery students)
     {
         return Ok(await Mediator.Send(students));
     }
