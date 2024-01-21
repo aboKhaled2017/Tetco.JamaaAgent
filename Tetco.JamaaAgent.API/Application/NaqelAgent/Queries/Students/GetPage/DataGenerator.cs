@@ -1,7 +1,7 @@
 ﻿using Application.NaqelAgent.Models;
 using Bogus;
 
-namespace Application.NaqelAgent.Queries.GetAllStudents
+namespace Application.NaqelAgent.Queries.Students.GetPage
 {
     public class DataGenerator
     {
@@ -45,7 +45,7 @@ namespace Application.NaqelAgent.Queries.GetAllStudents
                 .RuleFor(a => a.GPATypeCode, f => f.Random.String2(5))
                 .RuleFor(a => a.GPA, f => f.Random.Double(2.0, 4.0).ToString("0.00"))
                 .RuleFor(a => a.RatingCode, f => f.Random.String2(5))
-                .RuleFor(a => a.HasThesis, f => f.Random.Bool().ToString())
+                .RuleFor(a => a.HasThesis, f => f.Random.Number(0, 1).ToString())
                 .RuleFor(a => a.ThesisTitle, f => f.Lorem.Sentence())
                 .RuleFor(a => a.LastAcademicStatusUpdateDate, f => f.Date.Recent().ToString("yyyy-MM-dd"))
                 .RuleFor(a => a.DisclaimerDate, f => f.Date.Recent().ToString("yyyy-MM-dd"))
