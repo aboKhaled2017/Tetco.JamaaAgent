@@ -3,9 +3,9 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace JamaaHub.Tests.Abstractions
+namespace JamaaAgent.API.Tests.Abstractions
 {
-    public abstract class BaseIntegrationTest: IAsyncDisposable
+    public abstract class BaseIntegrationTest : IAsyncDisposable
     {
 
         private readonly IServiceProvider _sp;
@@ -13,12 +13,12 @@ namespace JamaaHub.Tests.Abstractions
         public BaseIntegrationTest()
         {
             // Initialize the in-memory database
-          
+
             //create new DI for registering context & settings
             var services = new ServiceCollection();
 
-          
-          
+
+
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             services.AddMediatR(cfg =>
@@ -31,7 +31,7 @@ namespace JamaaHub.Tests.Abstractions
             _sp = services.BuildServiceProvider();
 
             _mediator = _sp.GetRequiredService<ISender>();
-            
+
         }
 
         protected abstract void SetupAddtionalServices(ServiceCollection services);

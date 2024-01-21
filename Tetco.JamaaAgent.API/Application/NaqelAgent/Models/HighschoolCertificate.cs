@@ -1,4 +1,4 @@
-﻿namespace Domain.Models
+﻿namespace Application.NaqelAgent.Models
 {
     public class HighschoolCertificate
     {
