@@ -20,7 +20,7 @@ public sealed class StudentController : ApiControllerBase
 
 
     [HttpPost("getMetaData")]
-    public async Task<IActionResult> getMetaData(GetStudentsMetaDataRes students)
+    public async Task<IActionResult> getMetaData(GetStudentsMetaDataQuery students)
     {
         return Ok(await Mediator.Send(students));
     }
