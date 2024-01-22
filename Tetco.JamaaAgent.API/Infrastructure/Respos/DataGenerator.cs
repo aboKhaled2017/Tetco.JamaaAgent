@@ -1,7 +1,8 @@
-﻿using Application.NaqelAgent.Models;
+﻿
+using Application.NaqelAgent.Models;
 using Bogus;
 
-namespace Application.NaqelAgent.Queries.Students.GetPage
+namespace Infrastructure.Respos
 {
     public class DataGenerator
     {

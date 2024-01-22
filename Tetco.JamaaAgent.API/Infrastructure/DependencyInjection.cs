@@ -1,4 +1,6 @@
-﻿using Application.Common.Settings;
+﻿using Application.Common.Interfaces;
+using Application.Common.Settings;
+using Infrastructure.Respos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -19,7 +21,8 @@ public static class DependencyInjection
         services.AddJamaaAgentAuthorization();
         
         services.AddSingleton(TimeProvider.System);
-  
+        services.AddScoped<IStudentQuery,StudentQueryBySQLDbprovider>();
+
 
         return services;
     }
