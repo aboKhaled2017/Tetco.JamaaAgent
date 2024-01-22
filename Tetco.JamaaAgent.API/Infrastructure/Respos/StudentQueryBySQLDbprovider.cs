@@ -15,11 +15,11 @@ namespace Infrastructure.Respos
             //_generalSetting = generalSetting;
         }
 
-        public async Task<long> GetTotalCount()
+        public async Task<(long TotalCount, DateTime LastBatchUpdate)> GetTotalCount()
         {
             await Task.Delay(1);
             long totalCount = 1000;
-            return totalCount;
+            return (totalCount,DateTime.Now);
         }
 
         public async Task<IEnumerable<Student>> GetAllAsync(int pageSize , int pageNumber, DateTime LastBatchUpdate)
