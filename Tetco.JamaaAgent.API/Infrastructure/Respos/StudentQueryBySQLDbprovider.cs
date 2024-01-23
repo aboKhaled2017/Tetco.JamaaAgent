@@ -63,6 +63,9 @@ namespace Infrastructure.Respos
             if (pageNumber < 1)
                 pageNumber = 1;
 
+            if (pageSize < 1)
+                pageSize = 1;
+
             using var connection = new SqlConnection(_generalSetting.ConnectionStr);
             await connection.OpenAsync();
 
