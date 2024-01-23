@@ -60,8 +60,8 @@ namespace Infrastructure.Respos
 
         private async Task<IEnumerable<Dictionary<string, object>>> GetDynamicDataFromViewAsync(int pageSize , int pageNumber, DateTime? LastBatchUpdate)
         {
-            if (pageSize < 1)
-                pageSize = 1;
+            if (pageNumber < 1)
+                pageNumber = 1;
 
             using var connection = new SqlConnection(_generalSetting.ConnectionStr);
             await connection.OpenAsync();
