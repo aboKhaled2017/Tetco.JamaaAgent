@@ -3,9 +3,11 @@ using Domain.Common.Patterns;
 
 namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
 {
-    public sealed record GetStudentsMetaDataRes(IEnumerable<Dictionary<string, object>> ColumnInformation, long totalCount, DateTime? lastBatchUpdate);
+    public sealed record GetStudentsMetaDataRes(IEnumerable<ViewsMetaData> ViewsMetaData);
     public sealed class GetStudentsMetaDataQuery : IRequest<Result<GetStudentsMetaDataRes>>
     {
+        public List<string> Views { get; set; }
+        public int ProviderId { get; set; }
     }
     public sealed class GetStudentsMetaDataQueryHandler : IRequestHandler<GetStudentsMetaDataQuery, Result<GetStudentsMetaDataRes>>
     {
@@ -17,13 +19,14 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
         }
         public async Task<Result<GetStudentsMetaDataRes>> Handle(GetStudentsMetaDataQuery request, CancellationToken cancellationToken)
         {
-            var result = await _db.GetColumnInformation();
+            var result = await _db.GetColumnInformation(request.Views);
             return Result<GetStudentsMetaDataRes>.Success("data retreived successfully")
-                .WithData(new(result.ColumnInformation,result.totalCount,result.lastBatchUpdate));
+                .WithData(new(result));
 
         }
 
     }
 
+    public record ViewsMetaData(dynamic ColumnInformation, long TotalCount, DateTime? LastBatchUpdate,string ViewName);
 
 }

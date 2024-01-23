@@ -8,7 +8,7 @@ namespace API.Controllers;
 [MustHaveAgentApiKey]
 [ApiController]
 [Route("api/[controller]")]
-public sealed class StudentController : ApiControllerBase
+public sealed class AgentController : ApiControllerBase
 {
 
 
