@@ -122,12 +122,6 @@ namespace Infrastructure.Respos
                 var masterQuery = $@"SELECT * FROM {masterViewName}  ORDER BY {associationColumnName} OFFSET {pageSize * (pageNumber - 1)} ROWS FETCH NEXT {pageSize} ROWS ONLY;";
                 var mastrViewData = await connection.QueryAsync<dynamic>(masterQuery, commandTimeout: 100000);
 
-                //var values = mastrViewData
-                //    .Select(c => new
-                //    {
-                //        ColumnValue = c[associationColumnName],
-                //    })
-                //    .ToList();
                 var values = mastrViewData
                             .Cast<IDictionary<string, object>>()  // Explicitly cast each dynamic object to IDictionary<string, object>
                             .Select(c => new
@@ -150,7 +144,10 @@ namespace Infrastructure.Respos
                         var viewDetails = new ViewDetail(data, viewName);
                         result.Add(viewDetails);
                     }
+                    result.Add(new ViewDetail(mastrViewData, masterViewName));
                 }
+
+                
             }
             return result;
         }
