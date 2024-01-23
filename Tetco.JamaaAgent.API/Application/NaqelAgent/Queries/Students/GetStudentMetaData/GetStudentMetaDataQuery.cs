@@ -3,7 +3,7 @@ using Domain.Common.Patterns;
 
 namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
 {
-    public sealed record GetStudentsMetaDataRes(long totalItems,DateTime LastBatchUpdate);
+    public sealed record GetStudentsMetaDataRes(IEnumerable<Dictionary<string, object>> ColumnInformation, long totalCount, DateTime? lastBatchUpdate);
     public sealed class GetStudentsMetaDataQuery : IRequest<Result<GetStudentsMetaDataRes>>
     {
     }
@@ -17,10 +17,9 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
         }
         public async Task<Result<GetStudentsMetaDataRes>> Handle(GetStudentsMetaDataQuery request, CancellationToken cancellationToken)
         {
-            await Task.Delay(1);
-            var result = await _db.GetTotalCount();
+            var result = await _db.GetColumnInformation();
             return Result<GetStudentsMetaDataRes>.Success("data retreived successfully")
-                .WithData(new(result.TotalCount , result.LastBatchUpdate));
+                .WithData(new(result.ColumnInformation,result.totalCount,result.lastBatchUpdate));
 
         }
 

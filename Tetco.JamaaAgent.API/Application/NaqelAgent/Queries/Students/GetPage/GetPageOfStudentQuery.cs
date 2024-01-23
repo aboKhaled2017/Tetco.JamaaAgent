@@ -1,17 +1,16 @@
 ﻿using Application.Common.Interfaces;
-using Application.NaqelAgent.Models;
 
 using Domain.Common.Patterns;
 
 namespace Application.NaqelAgent.Queries.Students.GetPage
 {
-    public sealed record GetPageOfStudentRes(string instituteCode, List<Student> students);
+    public sealed record GetPageOfStudentRes(string instituteCode, IEnumerable<Dictionary<string, object>> students);
     public sealed class GetPageOfStudentQuery : IRequest<Result<GetPageOfStudentRes>>
     {
         public int pageNumber { get; set; } = 1;
         public int pageSize { get; set; } = 100;
 
-        public DateTime LastBatchUpdate { get; set; }
+        public DateTime? LastBatchUpdate { get; set; }
     }
     public sealed class GetPageOfStudentQueryHandler : IRequestHandler<GetPageOfStudentQuery, Result<GetPageOfStudentRes>>
     {
@@ -26,7 +25,7 @@ namespace Application.NaqelAgent.Queries.Students.GetPage
         {
             var students = await _db.GetAllAsync(request.pageSize,request.pageNumber,request.LastBatchUpdate);
             return Result<GetPageOfStudentRes>.Success("data retreived successfully")
-                .WithData(new("1234", students.ToList()));
+                .WithData(new("1234", students));
 
         }
 

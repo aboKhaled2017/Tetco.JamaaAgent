@@ -3,11 +3,12 @@ using API.CrossCuttings.MiddleWares;
 using API.CrossCuttings.OpenAPI;
 using Application;
 using Infrastructure;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder ( args );
 
 // Add services to the container.
-builder.Services.AddApplicationServices ( );
+builder.Services.AddApplicationServices(builder.Configuration);
 
 builder.Services.AddInfrastructureServices ( builder.Configuration );
 

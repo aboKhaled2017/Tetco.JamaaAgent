@@ -1,6 +1,8 @@
 ﻿using Application.Common.Behaviours;
 using Application.Common.Services;
 using Domain.Common.Interfaces;
+using Domain.Common.Settings;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -8,7 +10,7 @@ namespace Application;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
@@ -22,6 +24,10 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
         });
         services.AddTransient<ISerializer, NewtonsoftJsonSerializer>();
+
+        var generalSetting = configuration.GetSection("GeneralSetting").Get<GeneralSetting>();
+        services.AddSingleton(generalSetting);
+
         return services;
     }
 }

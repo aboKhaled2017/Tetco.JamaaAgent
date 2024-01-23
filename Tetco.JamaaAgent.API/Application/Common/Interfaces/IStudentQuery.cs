@@ -4,7 +4,7 @@ namespace Application.Common.Interfaces
 {
     public interface IStudentQuery
     {
-        Task<IEnumerable<Student>> GetAllAsync(int pageSize,int pageNumber, DateTime LastBatchUpdate);
-        Task<(long TotalCount,DateTime LastBatchUpdate)> GetTotalCount();
+        Task<IEnumerable<Dictionary<string, object>>> GetAllAsync(int pageSize,int pageNumber, DateTime? LastBatchUpdate);
+        Task<(IEnumerable<Dictionary<string, object>> ColumnInformation, long totalCount, DateTime? lastBatchUpdate)> GetColumnInformation();
     }
 }
