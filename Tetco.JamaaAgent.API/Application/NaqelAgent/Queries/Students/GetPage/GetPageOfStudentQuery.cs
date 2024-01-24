@@ -14,6 +14,7 @@ namespace Application.NaqelAgent.Queries.Students.GetPage
         public string AssociationColumnName { get; set; }
         public string ColumnNameFilter { get; set; }
         public int ProviderId { get; set; }
+        public string connectionStr { get; set; }
 
     }
     public sealed class GetPageOfStudentQueryHandler : IRequestHandler<GetPageOfStudentQuery, Result<GetPageOfStudentRes>>

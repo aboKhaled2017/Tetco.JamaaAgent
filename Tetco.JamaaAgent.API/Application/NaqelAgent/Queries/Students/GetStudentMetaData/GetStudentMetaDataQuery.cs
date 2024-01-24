@@ -8,6 +8,7 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
     {
         public List<string> Views { get; set; }
         public int ProviderId { get; set; }
+        public string connectionStr { get; set; }
     }
     public sealed class GetStudentsMetaDataQueryHandler : IRequestHandler<GetStudentsMetaDataQuery, Result<GetStudentsMetaDataRes>>
     {
