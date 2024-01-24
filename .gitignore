@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Tetco.JamaaAgent.API/API/Properties/launchSettings.json
+/Tetco.JamaaAgent.API/API/appsettings.Development.json
+/Tetco.JamaaAgent.API/API/appsettings.json
