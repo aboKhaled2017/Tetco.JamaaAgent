@@ -8,13 +8,15 @@ namespace Application.NaqelAgent.Queries.Students.GetPage
     {
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 100;
-        public DateTime? LastBatchUpdate { get; set; }
+        public string SchemaName { get; set; }
         public string MasterView { get; set; }
         public List<string> RelatedViews { get; set; }
         public string AssociationColumnName { get; set; }
         public string ColumnNameFilter { get; set; }
+        public string From { get; set; }
+        public string To { get; set; }
         public int ProviderId { get; set; }
-        public string connectionStr { get; set; }
+        public string ConnectionStr { get; set; }
 
     }
     public sealed class GetPageOfStudentQueryHandler : IRequestHandler<GetPageOfStudentQuery, Result<GetPageOfStudentRes>>
@@ -28,7 +30,7 @@ namespace Application.NaqelAgent.Queries.Students.GetPage
 
         public async Task<Result<GetPageOfStudentRes>> Handle(GetPageOfStudentQuery request, CancellationToken cancellationToken)
         {
-            var students = await _db.GetAllAsync(request.PageSize, request.PageNumber, request.LastBatchUpdate, request.MasterView, request.RelatedViews, request.AssociationColumnName,request.ColumnNameFilter);
+            var students = await _db.GetAllAsync(request.PageSize, request.PageNumber,request.SchemaName,request.MasterView, request.RelatedViews, request.AssociationColumnName,request.ColumnNameFilter,request.From,request.To);
             return Result<GetPageOfStudentRes>.Success("data retreived successfully")
                 .WithData(new("1234", students));
         }

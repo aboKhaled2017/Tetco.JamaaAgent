@@ -16,17 +16,17 @@ namespace Infrastructure.Respos
             _generalSetting = generalSetting;
         }
 
-        public async Task<IEnumerable<ViewDetail>> GetAllAsync(int pageSize, int pageNumber, DateTime? LastBatchUpdate, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter)
+        public async Task<IEnumerable<ViewDetail>> GetAllAsync(int pageSize, int pageNumber,string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter,string from , string to)
         {
-            return await GetDynamicDataFromViewAsync(pageSize, pageNumber, LastBatchUpdate, masterViewName, relatedViews, associationColumnName, columnNameFilter);
+            return await GetDynamicDataFromViewAsync(pageSize, pageNumber,schemaName, masterViewName, relatedViews, associationColumnName, columnNameFilter,from,to);
         }
 
-        public async Task<IEnumerable<ViewsMetaData>> GetColumnInformation(List<string> views)
+        public async Task<IEnumerable<ViewsMetaData>> GetColumnInformation(string schemaName, List<string> views)
         {
-            return await GetColumnInformationAsync(views);
+            return await GetColumnInformationAsync(schemaName,views);
         }
 
-        public async Task<IEnumerable<ViewsMetaData>> GetColumnInformationAsync(List<string> views)
+        private async Task<IEnumerable<ViewsMetaData>> GetColumnInformationAsync(string schemaName,List<string> views)
         {
             var result = new List<ViewsMetaData>();
 
@@ -35,15 +35,16 @@ namespace Infrastructure.Respos
                 using (var connection = new SqlConnection(_generalSetting.ConnectionStr))
                 {
                     await connection.OpenAsync();
-
                     var multipleQueries = "";
 
                     foreach (var viewName in views)
                     {
-                        multipleQueries += $@"
-                    SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
-                    FROM INFORMATION_SCHEMA.COLUMNS
-                    WHERE TABLE_NAME = '{viewName}';";
+                        multipleQueries += $@"SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+                                              FROM INFORMATION_SCHEMA.COLUMNS
+                                              WHERE 
+                                              TABLE_SCHEMA = '{schemaName}' 
+                                              AND
+                                              TABLE_NAME = '{viewName}';";
                     }
 
                     var datares = await connection.QueryMultipleAsync(multipleQueries, commandTimeout: 100000);
@@ -51,7 +52,7 @@ namespace Infrastructure.Respos
                     foreach (var viewName in views)
                     {
                         var data = datares.Read<dynamic>().ToList();
-                        var viewDetails = new ViewsMetaData(data, 1000, DateTime.Now, viewName);
+                        var viewDetails = new ViewsMetaData($"{schemaName}.{viewName}", data, 1000, DateTime.Now);
                         result.Add(viewDetails);
                     }
                 }
@@ -68,8 +69,7 @@ namespace Infrastructure.Respos
             return result;
         }
 
-
-        private async Task<IEnumerable<ViewDetail>> GetDynamicDataFromViewAsync(int pageSize, int pageNumber, DateTime? lastBatchUpdate, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter)
+        private async Task<IEnumerable<ViewDetail>> GetDynamicDataFromViewAsync(int pageSize, int pageNumber, string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter, string from,string to)
         {
             if (pageNumber < 1)
                 pageNumber = 1;
@@ -85,31 +85,31 @@ namespace Infrastructure.Respos
                 {
                     await connection.OpenAsync();
 
-                    var masterQuery = $@"SELECT * FROM {masterViewName}  ORDER BY {associationColumnName} OFFSET {pageSize * (pageNumber - 1)} ROWS FETCH NEXT {pageSize} ROWS ONLY;";
+                    var masterQuery = $@"SELECT * FROM {schemaName}.{masterViewName}  ORDER BY {associationColumnName} OFFSET {pageSize * (pageNumber - 1)} ROWS FETCH NEXT {pageSize} ROWS ONLY;";
                     var masterViewData = await connection.QueryAsync<dynamic>(masterQuery, commandTimeout: 100000);
 
                     var values = masterViewData
                                 .Cast<IDictionary<string, object>>()  // Explicitly cast each dynamic object to IDictionary<string, object>
                                 .Select(c => 
-                                     (c[associationColumnName]).ToString()
-                                )
+                                     (c[associationColumnName]).ToString())
                                 .ToList();
 
                     if (values?.Any() ?? false)
                     {
+                        result.Add(new ViewDetail(masterViewData, $"{schemaName}.{masterViewName}"));
                         var multipleQueries = string.Empty;
+
                         foreach (var viewName in relatedViews)
-                        {
-                            multipleQueries += $@"SELECT * FROM {viewName} where {associationColumnName} in @FilteredValues;";
-                        }
+                            multipleQueries += $@"SELECT * FROM {schemaName}.{viewName} where {associationColumnName} in @FilteredValues;";
+
                         var resultForRelatedViews = await connection.QueryMultipleAsync(multipleQueries, new { FilteredValues = values }, commandTimeout: 100000);
+
                         foreach (var viewName in relatedViews)
                         {
                             var data = resultForRelatedViews.Read<dynamic>().ToList();
-                            var viewDetails = new ViewDetail(data, viewName);
+                            var viewDetails = new ViewDetail(data, $"{schemaName}.{viewName}");
                             result.Add(viewDetails);
                         }
-                        result.Add(new ViewDetail(masterViewData, masterViewName));
                     }
                 }
             }

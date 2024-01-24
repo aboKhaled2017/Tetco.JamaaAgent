@@ -6,9 +6,10 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
     public sealed record GetStudentsMetaDataRes(IEnumerable<ViewsMetaData> ViewsMetaData);
     public sealed class GetStudentsMetaDataQuery : IRequest<Result<GetStudentsMetaDataRes>>
     {
+        public string SchemaName { get; set; }
         public List<string> Views { get; set; }
         public int ProviderId { get; set; }
-        public string connectionStr { get; set; }
+        public string ConnectionStr { get; set; }
     }
     public sealed class GetStudentsMetaDataQueryHandler : IRequestHandler<GetStudentsMetaDataQuery, Result<GetStudentsMetaDataRes>>
     {
@@ -20,7 +21,7 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
         }
         public async Task<Result<GetStudentsMetaDataRes>> Handle(GetStudentsMetaDataQuery request, CancellationToken cancellationToken)
         {
-            var result = await _db.GetColumnInformation(request.Views);
+            var result = await _db.GetColumnInformation(request.SchemaName,request.Views);
             return Result<GetStudentsMetaDataRes>.Success("data retreived successfully")
                 .WithData(new(result));
 
@@ -28,6 +29,6 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
 
     }
 
-    public record ViewsMetaData(dynamic ColumnInformation, long TotalCount, DateTime? LastBatchUpdate,string ViewName);
+    public record ViewsMetaData(string ViewName,dynamic ColumnInformation, long TotalCount, DateTime? LastBatchUpdate);
 
 }

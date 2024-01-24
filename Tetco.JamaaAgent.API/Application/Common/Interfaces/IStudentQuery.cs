@@ -5,7 +5,7 @@ namespace Application.Common.Interfaces
 {
     public interface IStudentQuery
     {
-        Task<IEnumerable<ViewDetail>> GetAllAsync(int pageSize,int pageNumber, DateTime? lastBatchUpdate, string masterViewName , List<string> RelatedViews ,string associationColumnName, string columnNameFilter);
-        Task<IEnumerable<ViewsMetaData>> GetColumnInformation(List<string> views);
+        Task<IEnumerable<ViewDetail>> GetAllAsync(int pageSize, int pageNumber, string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter, string from, string to);
+        Task<IEnumerable<ViewsMetaData>> GetColumnInformation(string schemaName,List<string> views);
     }
 }
