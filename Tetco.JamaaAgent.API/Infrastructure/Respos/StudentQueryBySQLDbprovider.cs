@@ -4,6 +4,7 @@ using Application.NaqelAgent.Queries.Students.GetStudentMetaData;
 using Dapper;
 using Domain.Common.Settings;
 using System.Data.SqlClient;
+using System.Text;
 
 
 namespace Infrastructure.Respos
@@ -11,6 +12,7 @@ namespace Infrastructure.Respos
     internal sealed class StudentQueryBySQLDbprovider : IStudentQuery
     {
         private readonly GeneralSetting _generalSetting;
+        private const int _timeout=100000;
         public StudentQueryBySQLDbprovider(GeneralSetting generalSetting)
         {
             _generalSetting = generalSetting;
@@ -26,7 +28,7 @@ namespace Infrastructure.Respos
             return await GetColumnInformationAsync(schemaName,views);
         }
 
-        private async Task<IEnumerable<ViewsMetaData>> GetColumnInformationAsync(string schemaName,List<string> views)
+        private async Task<IEnumerable<ViewsMetaData>> GetColumnInformationAsync(string schemaName, List<string> views)
         {
             var result = new List<ViewsMetaData>();
 
@@ -35,19 +37,21 @@ namespace Infrastructure.Respos
                 using (var connection = new SqlConnection(_generalSetting.ConnectionStr))
                 {
                     await connection.OpenAsync();
-                    var multipleQueries = "";
-
+                    var multipleQueries = new StringBuilder();
+                    var parameters = new DynamicParameters();
+                    parameters.Add("SchemaName", schemaName);
+                    var index = 0;
                     foreach (var viewName in views)
                     {
-                        multipleQueries += $@"SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
-                                              FROM INFORMATION_SCHEMA.COLUMNS
-                                              WHERE 
-                                              TABLE_SCHEMA = '{schemaName}' 
-                                              AND
-                                              TABLE_NAME = '{viewName}';";
+
+                        multipleQueries.Append($@"SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+                                          FROM INFORMATION_SCHEMA.COLUMNS
+                                          WHERE TABLE_SCHEMA = @SchemaName AND TABLE_NAME = @ViewName{index};");
+                        parameters.Add($"ViewName{index}", viewName);
+                        index++;
                     }
 
-                    var datares = await connection.QueryMultipleAsync(multipleQueries, commandTimeout: 100000);
+                    var datares = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _timeout);
 
                     foreach (var viewName in views)
                     {
@@ -69,7 +73,10 @@ namespace Infrastructure.Respos
             return result;
         }
 
-        private async Task<IEnumerable<ViewDetail>> GetDynamicDataFromViewAsync(int pageSize, int pageNumber, string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter, string from,string to)
+     
+
+
+        private async Task<IEnumerable<ViewDetail>> GetDynamicDataFromViewAsync(int pageSize, int pageNumber, string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter, string from, string to)
         {
             if (pageNumber < 1)
                 pageNumber = 1;
@@ -84,32 +91,31 @@ namespace Infrastructure.Respos
                 using (var connection = new SqlConnection(_generalSetting.ConnectionStr))
                 {
                     await connection.OpenAsync();
-
-                    var masterQuery = $@"SELECT * FROM {schemaName}.{masterViewName}  ORDER BY {associationColumnName} OFFSET {pageSize * (pageNumber - 1)} ROWS FETCH NEXT {pageSize} ROWS ONLY;";
-                    var masterViewData = await connection.QueryAsync<dynamic>(masterQuery, commandTimeout: 100000);
+                    var masterQuery = $@"SELECT * FROM [{schemaName}].[{masterViewName}] ORDER BY [{associationColumnName}] OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;";
+                    var masterViewData = await connection.QueryAsync<dynamic>(masterQuery, new { Offset = pageSize * (pageNumber - 1), PageSize = pageSize }, commandTimeout: _timeout);
 
                     var values = masterViewData
                                 .Cast<IDictionary<string, object>>()  // Explicitly cast each dynamic object to IDictionary<string, object>
-                                .Select(c => 
+                                .Select(c =>
                                      (c[associationColumnName]).ToString())
                                 .ToList();
 
-                    if (values?.Any() ?? false)
+                    var multipleQueries = new StringBuilder();
+                    var parameters = new DynamicParameters();
+                    parameters.Add("FilteredValues", values);
+
+                    foreach (var viewName in relatedViews)
                     {
-                        result.Add(new ViewDetail(masterViewData, $"{schemaName}.{masterViewName}"));
-                        var multipleQueries = string.Empty;
+                        multipleQueries.Append($"SELECT * FROM [{schemaName}].[{viewName}] WHERE [{associationColumnName}] in @FilteredValues;");
+                    }
 
-                        foreach (var viewName in relatedViews)
-                            multipleQueries += $@"SELECT * FROM {schemaName}.{viewName} where {associationColumnName} in @FilteredValues;";
+                    var resultForRelatedViews = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _timeout);
 
-                        var resultForRelatedViews = await connection.QueryMultipleAsync(multipleQueries, new { FilteredValues = values }, commandTimeout: 100000);
-
-                        foreach (var viewName in relatedViews)
-                        {
-                            var data = resultForRelatedViews.Read<dynamic>().ToList();
-                            var viewDetails = new ViewDetail(data, $"{schemaName}.{viewName}");
-                            result.Add(viewDetails);
-                        }
+                    foreach (var viewName in relatedViews)
+                    {
+                        var data = resultForRelatedViews.Read<dynamic>().ToList();
+                        var viewDetails = new ViewDetail(data, $"{schemaName}.{viewName}");
+                        result.Add(viewDetails);
                     }
                 }
             }
@@ -124,6 +130,7 @@ namespace Infrastructure.Respos
 
             return result;
         }
+
 
     }
 }
