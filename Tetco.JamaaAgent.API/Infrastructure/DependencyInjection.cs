@@ -25,6 +25,7 @@ public static class DependencyInjection
         RegisterRequiredProvider((Provider)generalSetting.StudentProviderId switch
         {
             Provider.SQL => typeof(StudentQueryBySQLDbprovider),
+            Provider.MySQL => typeof(StudentQueryByMySQLDbProvider),
             Provider.Oracle => typeof(StudentQueryByOracleDbprovider),
             // Add other cases as necessary
             _ => throw new InvalidOperationException($"Unsupported provider type: {generalSetting.StudentProviderId}")
