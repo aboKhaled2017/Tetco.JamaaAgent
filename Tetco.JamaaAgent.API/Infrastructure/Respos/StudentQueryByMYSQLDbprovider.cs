@@ -26,6 +26,13 @@ namespace Infrastructure.Respos
             return await GetColumnInformationAsync(schemaName, views);
         }
 
+        public Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query, Dictionary<string, string> paramters)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        #region Helper
         private async Task<IEnumerable<ViewsMetaData>> GetColumnInformationAsync(string schemaName, List<string> views)
         {
             var result = new List<ViewsMetaData>();
@@ -71,7 +78,6 @@ namespace Infrastructure.Respos
 
             return result;
         }
-
         private async Task<IEnumerable<ViewDetail>> GetDynamicDataFromViewAsync(int pageSize, int pageNumber, string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter, string from, string to)
         {
             if (pageNumber < 1)
@@ -126,5 +132,6 @@ namespace Infrastructure.Respos
 
             return result;
         }
+        #endregion
     }
 }

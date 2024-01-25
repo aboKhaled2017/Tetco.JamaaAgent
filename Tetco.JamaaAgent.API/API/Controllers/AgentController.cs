@@ -25,6 +25,12 @@ public sealed class AgentController : ApiControllerBase
         return Ok(await Mediator.Send(students));
     }
 
+    [HttpPost("getDynamicQueryData")]
+    public async Task<IActionResult> getDynamicQueryData(GetDynamicQueryDataReq students)
+    {
+        return Ok(await Mediator.Send(students));
+    }
+
 
     [HttpGet("healthCheck")]
     public async Task<IActionResult> AgentHealthCheck()

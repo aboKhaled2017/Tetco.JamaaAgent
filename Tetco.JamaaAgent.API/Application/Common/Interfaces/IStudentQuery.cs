@@ -7,5 +7,6 @@ namespace Application.Common.Interfaces
     {
         Task<IEnumerable<ViewDetail>> GetAllAsync(int pageSize, int pageNumber, string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter, string from, string to);
         Task<IEnumerable<ViewsMetaData>> GetColumnInformation(string schemaName,List<string> views);
+        Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query,Dictionary<string,string> paramters);
     }
 }
