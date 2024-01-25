@@ -14,5 +14,6 @@ namespace Domain.Common.Settings
         public string ConnectionStr { get; set; }
         public int TimeOut { get; set; }
         public int ProdviderId { get; set; }
+        public string InstituteCode { get; set; }
     }
 }
