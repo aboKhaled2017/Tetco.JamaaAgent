@@ -12,5 +12,7 @@ namespace Domain.Common.Settings
         //public SupportedProviders DataProviderType => SupportedProviders.GetByKey(DataProviderTypeStr);
 
         public string ConnectionStr { get; set; }
+        public int TimeOut { get; set; }
+        public int ProdviderId { get; set; }
     }
 }

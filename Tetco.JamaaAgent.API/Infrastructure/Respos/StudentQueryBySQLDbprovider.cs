@@ -12,7 +12,6 @@ namespace Infrastructure.Respos
     internal sealed class StudentQueryBySQLDbprovider : IStudentQuery
     {
         private readonly GeneralSetting _generalSetting;
-        private const int _timeout=100000;
         public StudentQueryBySQLDbprovider(GeneralSetting generalSetting)
         {
             _generalSetting = generalSetting;
@@ -53,7 +52,7 @@ namespace Infrastructure.Respos
                         index++;
                     }
 
-                    var datares = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _timeout);
+                    var datares = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _generalSetting.TimeOut);
 
                     foreach (var viewName in views)
                     {
@@ -93,7 +92,7 @@ namespace Infrastructure.Respos
                 {
                     await connection.OpenAsync();
                     var masterQuery = $@"SELECT * FROM [{schemaName}].[{masterViewName}] ORDER BY [{associationColumnName}] OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;";
-                    var masterViewData = await connection.QueryAsync<dynamic>(masterQuery, new { Offset = pageSize * (pageNumber - 1), PageSize = pageSize }, commandTimeout: _timeout);
+                    var masterViewData = await connection.QueryAsync<dynamic>(masterQuery, new { Offset = pageSize * (pageNumber - 1), PageSize = pageSize }, commandTimeout: _generalSetting.TimeOut);
 
                     var values = masterViewData
                                 .Cast<IDictionary<string, object>>()  // Explicitly cast each dynamic object to IDictionary<string, object>
@@ -110,7 +109,7 @@ namespace Infrastructure.Respos
                         multipleQueries.Append($"SELECT * FROM [{schemaName}].[{viewName}] WHERE [{associationColumnName}] in @FilteredValues;");
                     }
 
-                    var resultForRelatedViews = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _timeout);
+                    var resultForRelatedViews = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _generalSetting.TimeOut);
 
                     foreach (var viewName in relatedViews)
                     {
