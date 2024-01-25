@@ -44,7 +44,9 @@ namespace Infrastructure.Respos
                     foreach (var viewName in views)
                     {
 
-                        multipleQueries.Append($@"SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+                        multipleQueries.Append($@"SELECT count(*) from [{schemaName}].[{viewName}];
+
+                                          SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
                                           FROM INFORMATION_SCHEMA.COLUMNS
                                           WHERE TABLE_SCHEMA = @SchemaName AND TABLE_NAME = @ViewName{index};");
                         parameters.Add($"ViewName{index}", viewName);
@@ -55,8 +57,10 @@ namespace Infrastructure.Respos
 
                     foreach (var viewName in views)
                     {
+                        var count = datares.Read<long>().FirstOrDefault();
+                        //long.TryParse(countRes.ToString(), out long count);
                         var data = datares.Read<dynamic>().ToList();
-                        var viewDetails = new ViewsMetaData($"{schemaName}.{viewName}", data, 1000, DateTime.Now);
+                        var viewDetails = new ViewsMetaData($"{schemaName}.{viewName}", data, count, DateTime.Now);
                         result.Add(viewDetails);
                     }
                 }
@@ -72,9 +76,6 @@ namespace Infrastructure.Respos
 
             return result;
         }
-
-     
-
 
         private async Task<IEnumerable<ViewDetail>> GetDynamicDataFromViewAsync(int pageSize, int pageNumber, string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter, string from, string to)
         {
