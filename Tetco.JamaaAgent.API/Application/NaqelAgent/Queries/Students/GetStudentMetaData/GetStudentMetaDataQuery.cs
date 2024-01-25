@@ -4,7 +4,7 @@ using Domain.Common.Settings;
 
 namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
 {
-    public sealed record GetStudentsMetaDataRes(string instituteCode, IEnumerable<ViewsMetaData> ViewsMetaData);
+    public sealed record GetStudentsMetaDataRes(string InstituteCode,string AgentVersion, IEnumerable<ViewsMetaData> ViewsMetaData);
     public sealed class GetStudentsMetaDataQuery : IRequest<Result<GetStudentsMetaDataRes>>
     {
         public string SchemaName { get; set; }
@@ -26,7 +26,7 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
         {
             var result = await _db.GetColumnInformation(request.SchemaName,request.Views);
             return Result<GetStudentsMetaDataRes>.Success("data retreived successfully")
-                .WithData(new(_generalSetting.InstituteCode,result));
+                .WithData(new(_generalSetting.InstituteCode,_generalSetting.AgentVersion,result));
 
         }
 

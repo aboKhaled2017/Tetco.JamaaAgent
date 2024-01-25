@@ -15,5 +15,6 @@ namespace Domain.Common.Settings
         public int TimeOut { get; set; }
         public int StudentProviderId { get; set; }
         public string InstituteCode { get; set; }
+        public string AgentVersion { get; set; }
     }
 }
