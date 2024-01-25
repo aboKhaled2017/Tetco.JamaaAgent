@@ -10,7 +10,7 @@ namespace Application;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
@@ -25,8 +25,7 @@ public static class DependencyInjection
         });
         services.AddTransient<ISerializer, NewtonsoftJsonSerializer>();
 
-        var generalSetting = configuration.GetSection("GeneralSetting").Get<GeneralSetting>();
-        services.AddSingleton(generalSetting);
+     
 
         return services;
     }

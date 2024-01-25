@@ -2,15 +2,19 @@ using API;
 using API.CrossCuttings.MiddleWares;
 using API.CrossCuttings.OpenAPI;
 using Application;
+using Domain.Common.Settings;
 using Infrastructure;
 using Microsoft.Extensions.Configuration;
-
+using System.Configuration;
 var builder = WebApplication.CreateBuilder ( args );
 
-// Add services to the container.
-builder.Services.AddApplicationServices(builder.Configuration);
+var generalSetting = builder.Configuration.GetSection("GeneralSetting").Get<GeneralSetting>();
+builder.Services.AddSingleton(generalSetting);
 
-builder.Services.AddInfrastructureServices ( builder.Configuration );
+// Add services to the container.
+builder.Services.AddApplicationServices();
+
+builder.Services.AddInfrastructureServices ( builder.Configuration , generalSetting);
 
 //builder.Services.AddAutomatedAutorest ( );
 builder.Services.AddControllers ( );
