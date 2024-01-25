@@ -26,7 +26,7 @@ namespace Infrastructure.Respos
             return await GetColumnInformationAsync(schemaName, views);
         }
 
-        public Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query, Dictionary<string, string> paramters)
+        public Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query, Dictionary<string, string> paramters, int noOfQueries)
         {
             throw new NotImplementedException();
         }

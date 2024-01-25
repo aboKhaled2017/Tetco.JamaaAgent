@@ -4,8 +4,6 @@ using API.CrossCuttings.OpenAPI;
 using Application;
 using Domain.Common.Settings;
 using Infrastructure;
-using Microsoft.Extensions.Configuration;
-using System.Configuration;
 var builder = WebApplication.CreateBuilder ( args );
 
 var generalSetting = builder.Configuration.GetSection("GeneralSetting").Get<GeneralSetting>();

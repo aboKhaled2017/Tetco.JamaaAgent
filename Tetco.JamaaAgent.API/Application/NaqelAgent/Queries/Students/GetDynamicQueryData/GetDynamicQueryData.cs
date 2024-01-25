@@ -8,6 +8,7 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
     public sealed class GetDynamicQueryDataReq : IRequest<Result<GetDynamicQueryDataRes>>
     {
         public string Query { get; set; }
+        public int NoOfQueries { get; set; }
         public Dictionary<string,string> Parameters { get; set; }
 
     }
@@ -21,7 +22,7 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
         }
         public async Task<Result<GetDynamicQueryDataRes>> Handle(GetDynamicQueryDataReq request, CancellationToken cancellationToken)
         {
-            var result = await _db.GetDynamicInformation(request.Query,request.Parameters);
+            var result = await _db.GetDynamicInformation(request.Query,request.Parameters,request.NoOfQueries);
             return Result<GetDynamicQueryDataRes>.Success("data retreived successfully")
                 .WithData(new(result));
 
