@@ -20,13 +20,13 @@ public sealed class AgentController : ApiControllerBase
 
 
     [HttpPost("getMetaData")]
-    public async Task<IActionResult> getMetaData(GetStudentsMetaDataQuery students)
+    public async Task<IActionResult> GetMetaData(GetStudentsMetaDataQuery students)
     {
         return Ok(await Mediator.Send(students));
     }
 
     [HttpPost("getDynamicQueryData")]
-    public async Task<IActionResult> getDynamicQueryData(GetDynamicQueryDataReq students)
+    public async Task<IActionResult> GetDynamicQueryData(GetDynamicQueryDataReq students)
     {
         return Ok(await Mediator.Send(students));
     }
