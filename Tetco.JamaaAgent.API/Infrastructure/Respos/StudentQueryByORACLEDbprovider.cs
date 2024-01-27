@@ -27,12 +27,46 @@ namespace Infrastructure.Respos
             return await GetColumnInformationAsync(schemaName, views);
         }
 
-        public Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query, Dictionary<string, string> paramters, int noOfQueries)
+        public async Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query, Dictionary<string, string> paramters, int noOfQueries)
         {
-            throw new NotImplementedException();
+            return await GetDymaicData(query, paramters, noOfQueries);
         }
 
         #region Helper
+        private async Task<IEnumerable<ViewDynamicData>> GetDymaicData(string query, Dictionary<string, string> paramters, int noOfQueries)
+        {
+            var result = new List<ViewDynamicData>();
+            try
+            {
+                using (var connection = new OracleConnection(_generalSetting.ConnectionStr))
+                {
+                    await connection.OpenAsync();
+                    var multipleQueries = new StringBuilder(query);
+                    var parameters = new DynamicParameters();
+                    foreach (var paramter in paramters)
+                        parameters.Add(paramter.Key.ToString(), paramter.Value);
+
+                    var datares = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _generalSetting.TimeOut);
+
+                    for (int i = 0; i < noOfQueries - 1; i++)
+                    {
+                        var data = datares.Read<dynamic>().ToList();
+                        var viewDetails = new ViewDynamicData($"Result of Query Number {i}", data);
+                        result.Add(viewDetails);
+                    }
+                }
+            }
+            catch (OracleException sqlEx)
+            {
+                throw new Exception(sqlEx.Message, sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+            return result;
+        }
+
         private async Task<IEnumerable<ViewsMetaData>> GetColumnInformationAsync(string schemaName, List<string> views)
         {
             var result = new List<ViewsMetaData>();

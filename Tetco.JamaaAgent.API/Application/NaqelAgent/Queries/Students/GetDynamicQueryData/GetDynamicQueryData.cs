@@ -30,6 +30,6 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
 
     }
 
-    public record ViewDynamicData(dynamic Data);
+    public record ViewDynamicData(string QueryName,dynamic Data);
 
 }
