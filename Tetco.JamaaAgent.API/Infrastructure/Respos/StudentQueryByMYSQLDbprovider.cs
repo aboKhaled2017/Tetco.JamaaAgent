@@ -52,7 +52,7 @@ namespace Infrastructure.Respos
                     for (int i = 1; i < noOfQueries+1; i++)
                     {
                         var data = datares.Read<dynamic>().ToList();
-                        var viewDetails = new ViewDynamicData($"Result of Query Number {i}", data);
+                        var viewDetails = new ViewDynamicData($"Result of Query Number {i}", data,data.Count );
                         result.Add(viewDetails);
                     }
                 }

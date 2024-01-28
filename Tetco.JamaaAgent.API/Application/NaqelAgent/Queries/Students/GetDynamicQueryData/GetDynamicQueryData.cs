@@ -29,7 +29,7 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
 
     }
 
-    public record ViewDynamicData(string QueryName,dynamic Data);
+    public record ViewDynamicData(string QueryName,dynamic Data, int TotalCount);
 
     public record Paramter(string ParamterName,string Value);
 
