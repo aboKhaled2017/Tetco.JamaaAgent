@@ -27,7 +27,7 @@ namespace Infrastructure.Respos
             return await GetColumnInformationAsync(schemaName,views);
         }
 
-        public async Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query, Dictionary<string, string> paramters, int noOfQueries)
+        public async Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query, IEnumerable<Paramter> paramters, int noOfQueries)
         {
             return await GetDymaicData(query,paramters, noOfQueries);
         }
@@ -35,7 +35,7 @@ namespace Infrastructure.Respos
 
         #region Helper
 
-        private async Task<IEnumerable<ViewDynamicData>> GetDymaicData(string query, Dictionary<string, string> paramters, int noOfQueries)
+        private async Task<IEnumerable<ViewDynamicData>> GetDymaicData(string query, IEnumerable<Paramter> paramters, int noOfQueries)
         {
             var result = new List<ViewDynamicData>();
             try
@@ -46,11 +46,11 @@ namespace Infrastructure.Respos
                     var multipleQueries = new StringBuilder(query);
                     var parameters = new DynamicParameters();
                     foreach (var paramter in paramters)
-                        parameters.Add(paramter.Key.ToString(), paramter.Value);
+                        parameters.Add(paramter.ParamterName.ToString(), paramter.Value);
 
                     var datares = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _generalSetting.TimeOut);
 
-                    for (int i = 0; i < noOfQueries - 1; i++)
+                    for (int i = 1; i < noOfQueries + 1; i++)
                     {
                         var data = datares.Read<dynamic>().ToList();
                         var viewDetails = new ViewDynamicData($"Result of Query Number {i}",data);
