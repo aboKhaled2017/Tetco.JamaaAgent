@@ -2,6 +2,8 @@
 using Domain.Common.Settings;
 using Domain.Enums;
 using Infrastructure.Respos;
+using Infrastructure.Respos.Dynamic;
+using Infrastructure.Respos.Students;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,14 +24,22 @@ public static class DependencyInjection
         {
             services.AddScoped(typeof(IStudentQuery), serviceType);
         }
-        RegisterRequiredProvider((Provider)generalSetting.StudentProviderId switch
+        RegisterRequiredProvider((DBProvider)generalSetting.StudentProviderId switch
         {
-            Provider.SQL => typeof(StudentQueryBySQLDbprovider),
-            Provider.MySQL => typeof(StudentQueryByMySQLDbProvider),
-            Provider.Oracle => typeof(StudentQueryByOracleDbprovider),
+            DBProvider.SQL => typeof(StudentQueryBySQLDbprovider),
+            DBProvider.MySQL => typeof(StudentQueryByMySQLDbProvider),
+            DBProvider.Oracle => typeof(StudentQueryByOracleDbprovider),
             // Add other cases as necessary
             _ => throw new InvalidOperationException($"Unsupported provider type: {generalSetting.StudentProviderId}")
         });
+
+        services.AddScoped<IDefineProviderManager, DefineProviderManager>();
+        services.AddScoped<ICreateDatabaseFactory, CreateDatabaseFactory>();
+        services.AddScoped<IDynamicQuery, DynamicQueryByMYSQLDbprovider>();
+        services.AddScoped<IDynamicQuery, DynamicQueryBySQLDbprovider>();
+        services.AddScoped<IDynamicQuery, DynamicQueryByORACLEDbprovider>();
+       
+        
 
         return services;
     }

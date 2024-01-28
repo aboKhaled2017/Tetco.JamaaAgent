@@ -10,11 +10,28 @@ namespace Domain.Common.Settings
         //[Required(ErrorMessage = "data provider type is required")]
         //public string DataProviderTypeStr { get; set; }
         //public SupportedProviders DataProviderType => SupportedProviders.GetByKey(DataProviderTypeStr);
-
-        public string ConnectionStr { get; set; }
-        public int TimeOut { get; set; }
         public int StudentProviderId { get; set; }
+        public string ConnectionStr { get; set; }
+        public StudentConnection StudentConnection { get; set; }
+        public EmployeeConnection EmployeeConnection { get; set; }
+        public int TimeOut { get; set; }
+        
         public string InstituteCode { get; set; }
         public string AgentVersion { get; set; }
     }
+
+    public class StudentConnection
+    {
+        public string SQLConnectionStr { get; set; }
+        public string MySQLConnectionStr { get; set; }
+        public string ORACLEConnectionStr { get; set; }
+    }
+
+    public class EmployeeConnection
+    {
+        public string SQLConnectionStr { get; set; }
+        public string MySQLConnectionStr { get; set; }
+        public string ORACLEConnectionStr { get; set; }
+    }
+
 }

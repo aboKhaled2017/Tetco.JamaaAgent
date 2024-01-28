@@ -1,18 +1,19 @@
-﻿using Dapper;
-using Domain.Common.Settings;
-using System.Text;
-using Oracle.ManagedDataAccess.Client; 
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Application.NaqelAgent.Queries.Students.GetDynamicQueryData;
+using Application.NaqelAgent.Queries.Students.GetPage;
 using Application.NaqelAgent.Queries.Students.GetStudentMetaData;
-using Application.NaqelAgent.Queries.Students.GetPage; 
+using Dapper;
+using Domain.Common.Settings;
+using System.Data.SqlClient;
+using System.Text;
 
-namespace Infrastructure.Respos
+
+namespace Infrastructure.Respos.Students
 {
-    internal sealed class StudentQueryByOracleDbprovider : IStudentQuery
+    internal sealed class StudentQueryBySQLDbprovider : IStudentQuery
     {
         private readonly GeneralSetting _generalSetting;
-
-        public StudentQueryByOracleDbprovider(GeneralSetting generalSetting)
+        public StudentQueryBySQLDbprovider(GeneralSetting generalSetting)
         {
             _generalSetting = generalSetting;
         }
@@ -32,13 +33,15 @@ namespace Infrastructure.Respos
             return await GetDymaicData(query, paramters, noOfQueries);
         }
 
+
         #region Helper
+
         private async Task<IEnumerable<ViewDynamicData>> GetDymaicData(string query, IEnumerable<Paramter> paramters, int noOfQueries)
         {
             var result = new List<ViewDynamicData>();
             try
             {
-                using (var connection = new OracleConnection(_generalSetting.ConnectionStr))
+                using (var connection = new SqlConnection(_generalSetting.ConnectionStr))
                 {
                     await connection.OpenAsync();
                     var multipleQueries = new StringBuilder(query);
@@ -48,15 +51,15 @@ namespace Infrastructure.Respos
 
                     var datares = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _generalSetting.TimeOut);
 
-                    for (int i = 1; i < noOfQueries+1; i++)
+                    for (int i = 1; i < noOfQueries + 1; i++)
                     {
                         var data = datares.Read<dynamic>().ToList();
-                        var viewDetails = new ViewDynamicData($"Result of Query Number {i}", data,data.Count);
+                        var viewDetails = new ViewDynamicData($"Result of Query Number {i}", data, data.Count);
                         result.Add(viewDetails);
                     }
                 }
             }
-            catch (OracleException sqlEx)
+            catch (SqlException sqlEx)
             {
                 throw new Exception(sqlEx.Message, sqlEx);
             }
@@ -66,41 +69,46 @@ namespace Infrastructure.Respos
             }
             return result;
         }
-
         private async Task<IEnumerable<ViewsMetaData>> GetColumnInformationAsync(string schemaName, List<string> views)
         {
             var result = new List<ViewsMetaData>();
 
             try
             {
-                using (var connection = new OracleConnection(_generalSetting.ConnectionStr))
+                using (var connection = new SqlConnection(_generalSetting.ConnectionStr))
                 {
                     await connection.OpenAsync();
                     var multipleQueries = new StringBuilder();
                     var parameters = new DynamicParameters();
-
+                    parameters.Add("SchemaName", schemaName);
+                    var index = 0;
                     foreach (var viewName in views)
                     {
-                        multipleQueries.Append($@"SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
-                                                  FROM ALL_TAB_COLUMNS
-                                                  WHERE OWNER = :SchemaName AND TABLE_NAME = :ViewName;");
-                        parameters.Add("SchemaName", schemaName);
-                        parameters.Add("ViewName", viewName);
+
+                        multipleQueries.Append($@"SELECT count(*) from [{schemaName}].[{viewName}];
+
+                                          SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+                                          FROM INFORMATION_SCHEMA.COLUMNS
+                                          WHERE TABLE_SCHEMA = @SchemaName AND TABLE_NAME = @ViewName{index};");
+                        parameters.Add($"ViewName{index}", viewName);
+                        index++;
                     }
 
                     var datares = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _generalSetting.TimeOut);
 
                     foreach (var viewName in views)
                     {
+                        var count = datares.Read<long>().FirstOrDefault();
+                        //long.TryParse(countRes.ToString(), out long count);
                         var data = datares.Read<dynamic>().ToList();
-                        var viewDetails = new ViewsMetaData($"{schemaName}.{viewName}", data, data.Count, DateTime.Now);
+                        var viewDetails = new ViewsMetaData($"{schemaName}.{viewName}", data, count, DateTime.Now);
                         result.Add(viewDetails);
                     }
                 }
             }
-            catch (OracleException oracleEx)
+            catch (SqlException sqlEx)
             {
-                throw new Exception(oracleEx.Message, oracleEx);
+                throw new Exception(sqlEx.Message, sqlEx);
             }
             catch (Exception ex)
             {
@@ -121,25 +129,16 @@ namespace Infrastructure.Respos
 
             try
             {
-                using (var connection = new OracleConnection(_generalSetting.ConnectionStr))
+                using (var connection = new SqlConnection(_generalSetting.ConnectionStr))
                 {
                     await connection.OpenAsync();
-
-                    // Query for Oracle Database
-                    var masterQuery = $@"SELECT * FROM (
-                                            SELECT a.*, ROWNUM rnum FROM (
-                                                SELECT * FROM {schemaName}.{masterViewName} ORDER BY {associationColumnName}
-                                            ) a 
-                                            WHERE ROWNUM <= {pageNumber * pageSize}
-                                         )
-                                         WHERE rnum > {(pageNumber - 1) * pageSize}";
-
-                    var masterViewData = await connection.QueryAsync<dynamic>(masterQuery, new { }, commandTimeout: _generalSetting.TimeOut);
+                    var masterQuery = $@"SELECT * FROM [{schemaName}].[{masterViewName}] ORDER BY [{associationColumnName}] OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;";
+                    var masterViewData = await connection.QueryAsync<dynamic>(masterQuery, new { Offset = pageSize * (pageNumber - 1), PageSize = pageSize }, commandTimeout: _generalSetting.TimeOut);
 
                     var values = masterViewData
                                 .Cast<IDictionary<string, object>>()  // Explicitly cast each dynamic object to IDictionary<string, object>
                                 .Select(c =>
-                                     (c[associationColumnName]).ToString())
+                                     c[associationColumnName].ToString())
                                 .ToList();
 
                     var multipleQueries = new StringBuilder();
@@ -161,9 +160,9 @@ namespace Infrastructure.Respos
                     }
                 }
             }
-            catch (OracleException oracleEx)
+            catch (SqlException sqlEx)
             {
-                throw new Exception(oracleEx.Message, oracleEx);
+                throw new Exception(sqlEx.Message, sqlEx);
             }
             catch (Exception ex)
             {
@@ -173,5 +172,7 @@ namespace Infrastructure.Respos
             return result;
         }
         #endregion
+
     }
 }
+

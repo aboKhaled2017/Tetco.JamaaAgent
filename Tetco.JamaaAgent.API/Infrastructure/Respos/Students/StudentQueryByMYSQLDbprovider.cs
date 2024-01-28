@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.NaqelAgent.Queries.Students.GetDynamicQueryData;
 using Application.NaqelAgent.Queries.Students.GetPage;
 using Application.NaqelAgent.Queries.Students.GetStudentMetaData;
 using Dapper;
@@ -6,7 +7,7 @@ using Domain.Common.Settings;
 using MySql.Data.MySqlClient;
 using System.Text;
 
-namespace Infrastructure.Respos
+namespace Infrastructure.Respos.Students
 {
     internal sealed class StudentQueryByMySQLDbProvider : IStudentQuery
     {
@@ -49,10 +50,10 @@ namespace Infrastructure.Respos
 
                     var datares = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _generalSetting.TimeOut);
 
-                    for (int i = 1; i < noOfQueries+1; i++)
+                    for (int i = 1; i < noOfQueries + 1; i++)
                     {
                         var data = datares.Read<dynamic>().ToList();
-                        var viewDetails = new ViewDynamicData($"Result of Query Number {i}", data,data.Count );
+                        var viewDetails = new ViewDynamicData($"Result of Query Number {i}", data, data.Count);
                         result.Add(viewDetails);
                     }
                 }
@@ -134,7 +135,7 @@ namespace Infrastructure.Respos
 
                     var values = masterViewData
                                 .Cast<IDictionary<string, object>>()
-                                .Select(c => (c[associationColumnName]).ToString())
+                                .Select(c => c[associationColumnName].ToString())
                                 .ToList();
 
                     var multipleQueries = new StringBuilder();

@@ -1,4 +1,5 @@
 ﻿using API.CrossCuttings.Authorization;
+using Application.NaqelAgent.Queries.Students.GetDynamicQueryData;
 using Application.NaqelAgent.Queries.Students.GetPage;
 using Application.NaqelAgent.Queries.Students.GetStudentMetaData;
 using Microsoft.AspNetCore.Mvc;

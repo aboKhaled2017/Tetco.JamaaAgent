@@ -2,7 +2,7 @@
 using Application.NaqelAgent.Models;
 using Bogus;
 
-namespace Infrastructure.Respos
+namespace Infrastructure.Respos.Dummy
 {
     public class DataGenerator
     {

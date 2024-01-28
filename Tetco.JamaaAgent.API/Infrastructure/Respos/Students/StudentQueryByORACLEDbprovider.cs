@@ -1,46 +1,45 @@
-﻿using Application.Common.Interfaces;
-using Application.NaqelAgent.Queries.Students.GetPage;
-using Application.NaqelAgent.Queries.Students.GetStudentMetaData;
-using Dapper;
+﻿using Dapper;
 using Domain.Common.Settings;
-using System.Data.SqlClient;
 using System.Text;
+using Oracle.ManagedDataAccess.Client;
+using Application.Common.Interfaces;
+using Application.NaqelAgent.Queries.Students.GetStudentMetaData;
+using Application.NaqelAgent.Queries.Students.GetPage;
+using Application.NaqelAgent.Queries.Students.GetDynamicQueryData;
 
-
-namespace Infrastructure.Respos
+namespace Infrastructure.Respos.Students
 {
-    internal sealed class StudentQueryBySQLDbprovider : IStudentQuery
+    internal sealed class StudentQueryByOracleDbprovider : IStudentQuery
     {
         private readonly GeneralSetting _generalSetting;
-        public StudentQueryBySQLDbprovider(GeneralSetting generalSetting)
+
+        public StudentQueryByOracleDbprovider(GeneralSetting generalSetting)
         {
             _generalSetting = generalSetting;
         }
 
-        public async Task<IEnumerable<ViewDetail>> GetAllAsync(int pageSize, int pageNumber,string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter,string from , string to)
+        public async Task<IEnumerable<ViewDetail>> GetAllAsync(int pageSize, int pageNumber, string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter, string from, string to)
         {
-            return await GetDynamicDataFromViewAsync(pageSize, pageNumber,schemaName, masterViewName, relatedViews, associationColumnName, columnNameFilter,from,to);
+            return await GetDynamicDataFromViewAsync(pageSize, pageNumber, schemaName, masterViewName, relatedViews, associationColumnName, columnNameFilter, from, to);
         }
 
         public async Task<IEnumerable<ViewsMetaData>> GetColumnInformation(string schemaName, List<string> views)
         {
-            return await GetColumnInformationAsync(schemaName,views);
+            return await GetColumnInformationAsync(schemaName, views);
         }
 
         public async Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query, IEnumerable<Paramter> paramters, int noOfQueries)
         {
-            return await GetDymaicData(query,paramters, noOfQueries);
+            return await GetDymaicData(query, paramters, noOfQueries);
         }
 
-
         #region Helper
-
         private async Task<IEnumerable<ViewDynamicData>> GetDymaicData(string query, IEnumerable<Paramter> paramters, int noOfQueries)
         {
             var result = new List<ViewDynamicData>();
             try
             {
-                using (var connection = new SqlConnection(_generalSetting.ConnectionStr))
+                using (var connection = new OracleConnection(_generalSetting.ConnectionStr))
                 {
                     await connection.OpenAsync();
                     var multipleQueries = new StringBuilder(query);
@@ -53,12 +52,12 @@ namespace Infrastructure.Respos
                     for (int i = 1; i < noOfQueries + 1; i++)
                     {
                         var data = datares.Read<dynamic>().ToList();
-                        var viewDetails = new ViewDynamicData($"Result of Query Number {i}",data,data.Count);
+                        var viewDetails = new ViewDynamicData($"Result of Query Number {i}", data, data.Count);
                         result.Add(viewDetails);
                     }
                 }
             }
-            catch (SqlException sqlEx)
+            catch (OracleException sqlEx)
             {
                 throw new Exception(sqlEx.Message, sqlEx);
             }
@@ -68,46 +67,41 @@ namespace Infrastructure.Respos
             }
             return result;
         }
+
         private async Task<IEnumerable<ViewsMetaData>> GetColumnInformationAsync(string schemaName, List<string> views)
         {
             var result = new List<ViewsMetaData>();
 
             try
             {
-                using (var connection = new SqlConnection(_generalSetting.ConnectionStr))
+                using (var connection = new OracleConnection(_generalSetting.ConnectionStr))
                 {
                     await connection.OpenAsync();
                     var multipleQueries = new StringBuilder();
                     var parameters = new DynamicParameters();
-                    parameters.Add("SchemaName", schemaName);
-                    var index = 0;
+
                     foreach (var viewName in views)
                     {
-
-                        multipleQueries.Append($@"SELECT count(*) from [{schemaName}].[{viewName}];
-
-                                          SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
-                                          FROM INFORMATION_SCHEMA.COLUMNS
-                                          WHERE TABLE_SCHEMA = @SchemaName AND TABLE_NAME = @ViewName{index};");
-                        parameters.Add($"ViewName{index}", viewName);
-                        index++;
+                        multipleQueries.Append($@"SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+                                                  FROM ALL_TAB_COLUMNS
+                                                  WHERE OWNER = :SchemaName AND TABLE_NAME = :ViewName;");
+                        parameters.Add("SchemaName", schemaName);
+                        parameters.Add("ViewName", viewName);
                     }
 
                     var datares = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _generalSetting.TimeOut);
 
                     foreach (var viewName in views)
                     {
-                        var count = datares.Read<long>().FirstOrDefault();
-                        //long.TryParse(countRes.ToString(), out long count);
                         var data = datares.Read<dynamic>().ToList();
-                        var viewDetails = new ViewsMetaData($"{schemaName}.{viewName}", data, count, DateTime.Now);
+                        var viewDetails = new ViewsMetaData($"{schemaName}.{viewName}", data, data.Count, DateTime.Now);
                         result.Add(viewDetails);
                     }
                 }
             }
-            catch (SqlException sqlEx)
+            catch (OracleException oracleEx)
             {
-                throw new Exception(sqlEx.Message, sqlEx);
+                throw new Exception(oracleEx.Message, oracleEx);
             }
             catch (Exception ex)
             {
@@ -128,16 +122,25 @@ namespace Infrastructure.Respos
 
             try
             {
-                using (var connection = new SqlConnection(_generalSetting.ConnectionStr))
+                using (var connection = new OracleConnection(_generalSetting.ConnectionStr))
                 {
                     await connection.OpenAsync();
-                    var masterQuery = $@"SELECT * FROM [{schemaName}].[{masterViewName}] ORDER BY [{associationColumnName}] OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY;";
-                    var masterViewData = await connection.QueryAsync<dynamic>(masterQuery, new { Offset = pageSize * (pageNumber - 1), PageSize = pageSize }, commandTimeout: _generalSetting.TimeOut);
+
+                    // Query for Oracle Database
+                    var masterQuery = $@"SELECT * FROM (
+                                            SELECT a.*, ROWNUM rnum FROM (
+                                                SELECT * FROM {schemaName}.{masterViewName} ORDER BY {associationColumnName}
+                                            ) a 
+                                            WHERE ROWNUM <= {pageNumber * pageSize}
+                                         )
+                                         WHERE rnum > {(pageNumber - 1) * pageSize}";
+
+                    var masterViewData = await connection.QueryAsync<dynamic>(masterQuery, new { }, commandTimeout: _generalSetting.TimeOut);
 
                     var values = masterViewData
                                 .Cast<IDictionary<string, object>>()  // Explicitly cast each dynamic object to IDictionary<string, object>
                                 .Select(c =>
-                                     (c[associationColumnName]).ToString())
+                                     c[associationColumnName].ToString())
                                 .ToList();
 
                     var multipleQueries = new StringBuilder();
@@ -159,9 +162,9 @@ namespace Infrastructure.Respos
                     }
                 }
             }
-            catch (SqlException sqlEx)
+            catch (OracleException oracleEx)
             {
-                throw new Exception(sqlEx.Message, sqlEx);
+                throw new Exception(oracleEx.Message, oracleEx);
             }
             catch (Exception ex)
             {
@@ -171,7 +174,5 @@ namespace Infrastructure.Respos
             return result;
         }
         #endregion
-
     }
 }
-
