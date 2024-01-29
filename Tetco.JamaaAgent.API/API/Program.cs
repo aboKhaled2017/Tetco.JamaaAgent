@@ -15,14 +15,18 @@ builder.Services.AddSingleton(generalSetting);
 // Configure Serilog for logging
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Error() //TODO: I need to read it from appsetting
-    .WriteTo.Console()
     .WriteTo.File(
-        new CustomLogEntryFormatter(),
-        GetLogFilePath(),
-        rollingInterval: RollingInterval.Day
+    path: GetLogFilePath(),
+    formatter:new CustomLogEntryFormatter(),
+    rollingInterval: RollingInterval.Day
     )
     .CreateLogger();
 
+
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.AddSerilog();
+});
 
 
 // Add services to the container.
@@ -70,7 +74,7 @@ app.Run ( );
 string GetLogFilePath()
 {
     string logsDirectory = "logs";
-    string logFileName = $"log-{DateTime.Today:yyyy-MM-dd}.txt";
+    string logFileName = $"log-.txt";
     string logFilePath = Path.Combine(logsDirectory, logFileName);
 
     // Create the logs directory if it doesn't exist

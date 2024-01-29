@@ -11,7 +11,7 @@ namespace Application.Common.Utilities
     {
         public Result<GetAgentLogsRes> GetLogsByDate(DateOnly date, ILogger _logger)
         {
-            string logFileName = $"log-{date:yyyy-MM-dd}.txt";
+            string logFileName = $"log-{date:yyyyMMdd}.txt";
             string logDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "logs");
             string logFilePath = Path.Combine(logDirectoryPath, logFileName);
 

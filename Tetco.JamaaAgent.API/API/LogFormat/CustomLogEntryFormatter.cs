@@ -7,6 +7,7 @@ public class CustomLogEntryFormatter : ITextFormatter
 {
     public void Format(LogEvent logEvent, TextWriter output)
     {
+
         LogEntry entry = new LogEntry
         {
             Timestamp = logEvent.Timestamp.DateTime,
