@@ -1,11 +1,10 @@
-﻿using Dapper;
-using Domain.Common.Settings;
-using System.Text;
-using Oracle.ManagedDataAccess.Client;
-using Application.Common.Interfaces;
-using Application.Agent.Queries.Students.GetPage;
+﻿using Application.Agent.Queries.Students.GetPage;
 using Application.Agent.Queries.Students.GetStudentMetaData;
-using Application.Agent.Queries.GetDynamicQueryData;
+using Application.Common.Interfaces;
+using Dapper;
+using Domain.Common.Settings;
+using Oracle.ManagedDataAccess.Client;
+using System.Text;
 
 namespace Infrastructure.Respos.Students
 {
@@ -28,45 +27,7 @@ namespace Infrastructure.Respos.Students
             return await GetColumnInformationAsync(schemaName, views);
         }
 
-        public async Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query, IEnumerable<Paramter> paramters, int noOfQueries)
-        {
-            return await GetDymaicData(query, paramters, noOfQueries);
-        }
-
         #region Helper
-        private async Task<IEnumerable<ViewDynamicData>> GetDymaicData(string query, IEnumerable<Paramter> paramters, int noOfQueries)
-        {
-            var result = new List<ViewDynamicData>();
-            try
-            {
-                using (var connection = new OracleConnection(_generalSetting.ConnectionStr))
-                {
-                    await connection.OpenAsync();
-                    var multipleQueries = new StringBuilder(query);
-                    var parameters = new DynamicParameters();
-                    foreach (var paramter in paramters)
-                        parameters.Add(paramter.ParamterName.ToString(), paramter.Value);
-
-                    var datares = await connection.QueryMultipleAsync(multipleQueries.ToString(), parameters, commandTimeout: _generalSetting.TimeOut);
-
-                    for (int i = 1; i < noOfQueries + 1; i++)
-                    {
-                        var data = datares.Read<dynamic>().ToList();
-                        var viewDetails = new ViewDynamicData($"Result of Query Number {i}", data, data.Count);
-                        result.Add(viewDetails);
-                    }
-                }
-            }
-            catch (OracleException sqlEx)
-            {
-                throw new Exception(sqlEx.Message, sqlEx);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message, ex);
-            }
-            return result;
-        }
 
         private async Task<IEnumerable<ViewsMetaData>> GetColumnInformationAsync(string schemaName, List<string> views)
         {
@@ -74,7 +35,7 @@ namespace Infrastructure.Respos.Students
 
             try
             {
-                using (var connection = new OracleConnection(_generalSetting.ConnectionStr))
+                using (var connection = new OracleConnection(_generalSetting.StudentConnection.ORACLEConnectionStr))
                 {
                     await connection.OpenAsync();
                     var multipleQueries = new StringBuilder();
@@ -122,7 +83,7 @@ namespace Infrastructure.Respos.Students
 
             try
             {
-                using (var connection = new OracleConnection(_generalSetting.ConnectionStr))
+                using (var connection = new OracleConnection(_generalSetting.StudentConnection.ORACLEConnectionStr))
                 {
                     await connection.OpenAsync();
 

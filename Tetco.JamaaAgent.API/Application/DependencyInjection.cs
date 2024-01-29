@@ -1,8 +1,6 @@
 ﻿using Application.Common.Behaviours;
 using Application.Common.Services;
 using Domain.Common.Interfaces;
-using Domain.Common.Settings;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -24,8 +22,9 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
         });
         services.AddTransient<ISerializer, NewtonsoftJsonSerializer>();
+        services.AddTransient<Application.Common.Utilities.Helper>();
 
-     
+
 
         return services;
     }
