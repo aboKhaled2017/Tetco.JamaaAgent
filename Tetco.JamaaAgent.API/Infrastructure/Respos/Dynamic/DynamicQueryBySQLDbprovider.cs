@@ -2,21 +2,23 @@
 using Application.Common.Interfaces;
 using Dapper;
 using Domain.Common.Settings;
+using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
 using System.Text;
 
 
 namespace Infrastructure.Respos.Dynamic
 {
-    internal sealed class DynamicQueryBySQLDbprovider : IDynamicQuery
+    public sealed class DynamicQueryBySQLDbprovider : IDynamicQuery
     {
         private readonly GeneralSetting _generalSetting;
-
-        public DynamicQueryBySQLDbprovider(GeneralSetting generalSetting)
+        private readonly ILogger<DynamicQueryBySQLDbprovider> _logger;
+    
+        public DynamicQueryBySQLDbprovider(GeneralSetting generalSetting, ILogger<DynamicQueryBySQLDbprovider> logger)
         {
             _generalSetting = generalSetting ?? throw new ArgumentNullException(nameof(generalSetting));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
 
         public async Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query, IEnumerable<Paramter> paramters, int noOfQueries,string definedConnectionStr)
         {
@@ -49,10 +51,12 @@ namespace Infrastructure.Respos.Dynamic
             }
             catch (SqlException sqlEx)
             {
+                _logger.LogError(sqlEx.Message, sqlEx);
                 throw new Exception(sqlEx.Message, sqlEx);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 throw new Exception(ex.Message, ex);
             }
             return result;

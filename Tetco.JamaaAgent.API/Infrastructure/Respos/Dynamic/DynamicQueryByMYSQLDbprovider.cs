@@ -2,20 +2,21 @@
 using Application.Common.Interfaces;
 using Dapper;
 using Domain.Common.Settings;
-using Domain.Enums;
-using Infrastructure.Utilities;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System.Text;
 
 namespace Infrastructure.Respos.Dynamic
 {
-    internal sealed class DynamicQueryByMYSQLDbprovider : IDynamicQuery
+    public sealed class DynamicQueryByMYSQLDbprovider : IDynamicQuery
     {
         private readonly GeneralSetting _generalSetting;
+        private readonly ILogger<DynamicQueryByMYSQLDbprovider> _logger;
 
-        public DynamicQueryByMYSQLDbprovider(GeneralSetting generalSetting)
+        public DynamicQueryByMYSQLDbprovider(GeneralSetting generalSetting,ILogger<DynamicQueryByMYSQLDbprovider> logger)
         {
             _generalSetting = generalSetting ?? throw new ArgumentNullException(nameof(generalSetting));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
 
@@ -51,11 +52,14 @@ namespace Infrastructure.Respos.Dynamic
                 }
             }
             catch (MySqlException sqlEx)
-            {
+            { 
+                _logger.LogError(sqlEx.Message, sqlEx);
                 throw new Exception(sqlEx.Message, sqlEx);
+               
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 throw new Exception(ex.Message, ex);
             }
             return result;

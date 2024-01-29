@@ -3,6 +3,7 @@ using Application.Agent.Queries.Students.GetStudentMetaData;
 using Application.Common.Interfaces;
 using Dapper;
 using Domain.Common.Settings;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System.Text;
 
@@ -11,9 +12,12 @@ namespace Infrastructure.Respos.Students
     internal sealed class StudentQueryByMySQLDbProvider : IStudentQuery
     {
         private readonly GeneralSetting _generalSetting;
-        public StudentQueryByMySQLDbProvider(GeneralSetting generalSetting)
+        private readonly ILogger<StudentQueryByMySQLDbProvider> _logger;
+
+        public StudentQueryByMySQLDbProvider(GeneralSetting generalSetting, ILogger<StudentQueryByMySQLDbProvider> logger)
         {
-            _generalSetting = generalSetting;
+            _generalSetting = generalSetting ?? throw new ArgumentNullException(nameof(generalSetting));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IEnumerable<ViewDetail>> GetAllAsync(int pageSize, int pageNumber, string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter, string from, string to)
@@ -64,10 +68,12 @@ namespace Infrastructure.Respos.Students
             }
             catch (MySqlException mySqlEx)
             {
+                _logger.LogError(mySqlEx.Message, mySqlEx);
                 throw new Exception(mySqlEx.Message, mySqlEx);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 throw new Exception(ex.Message, ex);
             }
 
@@ -118,10 +124,12 @@ namespace Infrastructure.Respos.Students
             }
             catch (MySqlException mySqlEx)
             {
+                _logger.LogError(mySqlEx.Message, mySqlEx);
                 throw new Exception(mySqlEx.Message, mySqlEx);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 throw new Exception(ex.Message, ex);
             }
 

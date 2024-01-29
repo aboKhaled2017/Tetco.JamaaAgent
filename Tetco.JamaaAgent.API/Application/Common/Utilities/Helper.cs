@@ -11,7 +11,7 @@ namespace Application.Common.Utilities
     {
         public Result<GetAgentLogsRes> GetLogsByDate(DateOnly date, ILogger _logger)
         {
-            string logFileName = $"log-{date:yyyyMMdd}.txt";
+            string logFileName = $"log-{date:yyyyMMdd}.json";
             string logDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "logs");
             string logFilePath = Path.Combine(logDirectoryPath, logFileName);
 
@@ -22,26 +22,54 @@ namespace Application.Common.Utilities
             }
 
             var logEntries = new List<LogEntry>();
-            var logLines = System.IO.File.ReadAllLines(logFilePath, Encoding.UTF8);
 
-            foreach (var line in logLines)
+            try
             {
-                try
+                //using (var streamReader = new StreamReader(logFilePath, Encoding.UTF8))
+                //using (var jsonReader = new JsonTextReader(streamReader))
+                //{
+                //    var serializer = new JsonSerializer();
+                //    logEntries = serializer.Deserialize<List<LogEntry>>(jsonReader);
+
+                //}
+                var logLines = System.IO.File.ReadAllLines(logFilePath);
+                foreach (var line in logLines)
                 {
-                    var entry = JsonConvert.DeserializeObject<LogEntry>(line);
-                    if (entry != null)
+                    var logEntry = JsonConvert.DeserializeObject<LogEntry>(line);
+                    if (logEntry != null)
                     {
-                        logEntries.Add(entry);
+                        logEntries.Add(logEntry);
                     }
                 }
-                catch (JsonException jsonEx)
-                {
-                    // Handle the case where a line is not a valid JSON
-                    Console.WriteLine($"Error parsing log line: {line}. Error: {jsonEx.Message}");
-                }
+            }
+            catch (IOException ex) when (IsFileInUse(ex))
+            {
+                var errorDes = $"File '{logFilePath}' is in use.";
+                _logger.LogError(errorDes);
+                return Result<GetAgentLogsRes>.Failure("500", errorDes).WithData(new GetAgentLogsRes(logEntries));
+
+            }
+            catch (JsonException jsonEx)
+            {
+                var errorDes = $"Error deserializing JSON file '{logFilePath}'. Error: {jsonEx.Message}";
+                _logger.LogError(errorDes);
+                return Result<GetAgentLogsRes>.Failure("500", errorDes).WithData(new GetAgentLogsRes(logEntries));
+
+            }
+            catch (Exception ex)
+            {
+                var errorDes = $"Unexpected error reading JSON file '{logFilePath}'. Error: {ex.Message}";
+                    _logger.LogError(errorDes);
+                return Result<GetAgentLogsRes>.Failure("500", errorDes).WithData(new GetAgentLogsRes(logEntries));
+
             }
 
             return Result<GetAgentLogsRes>.Success("Data retrieved successfully").WithData(new GetAgentLogsRes(logEntries));
+        }
+
+        private bool IsFileInUse(IOException ex)
+        {
+            throw new NotImplementedException();
         }
     }
 }

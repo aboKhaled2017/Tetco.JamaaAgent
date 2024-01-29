@@ -3,6 +3,7 @@ using Application.Agent.Queries.Students.GetStudentMetaData;
 using Application.Common.Interfaces;
 using Dapper;
 using Domain.Common.Settings;
+using Microsoft.Extensions.Logging;
 using Oracle.ManagedDataAccess.Client;
 using System.Text;
 
@@ -11,10 +12,12 @@ namespace Infrastructure.Respos.Students
     internal sealed class StudentQueryByOracleDbprovider : IStudentQuery
     {
         private readonly GeneralSetting _generalSetting;
+        private readonly ILogger<StudentQueryByOracleDbprovider> _logger;
 
-        public StudentQueryByOracleDbprovider(GeneralSetting generalSetting)
+        public StudentQueryByOracleDbprovider(GeneralSetting generalSetting, ILogger<StudentQueryByOracleDbprovider> logger)
         {
-            _generalSetting = generalSetting;
+            _generalSetting = generalSetting ?? throw new ArgumentNullException(nameof(generalSetting));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IEnumerable<ViewDetail>> GetAllAsync(int pageSize, int pageNumber, string schemaName, string masterViewName, List<string> relatedViews, string associationColumnName, string columnNameFilter, string from, string to)
@@ -62,10 +65,12 @@ namespace Infrastructure.Respos.Students
             }
             catch (OracleException oracleEx)
             {
+                _logger.LogError(oracleEx.Message, oracleEx);
                 throw new Exception(oracleEx.Message, oracleEx);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 throw new Exception(ex.Message, ex);
             }
 
@@ -125,10 +130,12 @@ namespace Infrastructure.Respos.Students
             }
             catch (OracleException oracleEx)
             {
+                _logger.LogError(oracleEx.Message, oracleEx);
                 throw new Exception(oracleEx.Message, oracleEx);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 throw new Exception(ex.Message, ex);
             }
 

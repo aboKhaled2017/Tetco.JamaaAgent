@@ -11,22 +11,14 @@ var builder = WebApplication.CreateBuilder ( args );
 var generalSetting = builder.Configuration.GetSection("GeneralSetting").Get<GeneralSetting>();
 builder.Services.AddSingleton(generalSetting);
 
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .Build();
 
-// Configure Serilog for logging
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Error() //TODO: I need to read it from appsetting
-    .WriteTo.File(
-    path: GetLogFilePath(),
-    formatter:new CustomLogEntryFormatter(),
-    rollingInterval: RollingInterval.Day
-    )
-    .CreateLogger();
-
-
-builder.Services.AddLogging(loggingBuilder =>
-{
-    loggingBuilder.AddSerilog();
-});
+// Initialize Serilog
+builder.Host.UseSerilog((ctx, lc) => lc
+    .ReadFrom.Configuration(ctx.Configuration)
+    .Enrich.FromLogContext());
 
 
 // Add services to the container.
@@ -71,14 +63,3 @@ app.MapControllers ( );
 
 app.Run ( );
 
-string GetLogFilePath()
-{
-    string logsDirectory = "logs";
-    string logFileName = $"log-.txt";
-    string logFilePath = Path.Combine(logsDirectory, logFileName);
-
-    // Create the logs directory if it doesn't exist
-    Directory.CreateDirectory(logsDirectory);
-
-    return logFilePath;
-}

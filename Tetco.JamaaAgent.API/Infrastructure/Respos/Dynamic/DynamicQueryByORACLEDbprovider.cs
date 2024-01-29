@@ -2,18 +2,21 @@
 using Application.Common.Interfaces;
 using Dapper;
 using Domain.Common.Settings;
+using Microsoft.Extensions.Logging;
 using Oracle.ManagedDataAccess.Client;
 using System.Text;
 
 namespace Infrastructure.Respos.Dynamic
 {
-    internal sealed class DynamicQueryByORACLEDbprovider : IDynamicQuery
+    public sealed class DynamicQueryByORACLEDbprovider : IDynamicQuery
     {
         private readonly GeneralSetting _generalSetting;
+        private readonly ILogger<DynamicQueryByORACLEDbprovider> _logger;
 
-        public DynamicQueryByORACLEDbprovider(GeneralSetting generalSetting)
+        public DynamicQueryByORACLEDbprovider(GeneralSetting generalSetting,ILogger<DynamicQueryByORACLEDbprovider> logger)
         {
             _generalSetting = generalSetting ?? throw new ArgumentNullException(nameof(generalSetting));
+            _logger = logger ?? throw new ArgumentNullException( nameof(logger));
         }
 
         public async Task<IEnumerable<ViewDynamicData>> GetDynamicInformation(string query, IEnumerable<Paramter> paramters, int noOfQueries,string definedConnectionStr)
@@ -47,10 +50,12 @@ namespace Infrastructure.Respos.Dynamic
             }
             catch (OracleException sqlEx)
             {
+                _logger.LogError(sqlEx.Message, sqlEx);
                 throw new Exception(sqlEx.Message, sqlEx);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 throw new Exception(ex.Message, ex);
             }
             return result;
