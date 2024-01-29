@@ -1,5 +1,5 @@
-﻿using Application.Common.Interfaces;
-using Application.NaqelAgent.Queries.Agent.GetDynamicQueryData;
+﻿using Application.Agent.Queries.GetDynamicQueryData;
+using Application.Common.Interfaces;
 using Dapper;
 using Domain.Common.Settings;
 using System.Data.SqlClient;

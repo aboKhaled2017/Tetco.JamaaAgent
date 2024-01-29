@@ -1,12 +1,9 @@
-﻿using Dapper;
-using Domain.Common.Settings;
-using System.Text;
-using Oracle.ManagedDataAccess.Client;
+﻿using Application.Agent.Queries.GetDynamicQueryData;
 using Application.Common.Interfaces;
-using Application.NaqelAgent.Queries.Students.GetPage;
-using Domain.Enums;
-using Infrastructure.Utilities;
-using Application.NaqelAgent.Queries.Agent.GetDynamicQueryData;
+using Dapper;
+using Domain.Common.Settings;
+using Oracle.ManagedDataAccess.Client;
+using System.Text;
 
 namespace Infrastructure.Respos.Dynamic
 {

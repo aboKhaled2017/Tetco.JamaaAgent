@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.NaqelAgent.Models
+namespace Application.Common.Models
 {
     public class AcademicDetail
     {

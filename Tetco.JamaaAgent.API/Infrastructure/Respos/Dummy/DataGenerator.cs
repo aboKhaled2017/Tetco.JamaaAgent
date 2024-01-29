@@ -1,5 +1,5 @@
 ﻿
-using Application.NaqelAgent.Models;
+using Application.Common.Models;
 using Bogus;
 
 namespace Infrastructure.Respos.Dummy

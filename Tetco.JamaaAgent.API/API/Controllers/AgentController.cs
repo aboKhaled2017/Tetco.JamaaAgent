@@ -1,10 +1,9 @@
 ﻿using API.CrossCuttings.Authorization;
-using Application.NaqelAgent.Queries.Agent.GetAgentVersion;
-using Application.NaqelAgent.Queries.Agent.GetDynamicQueryData;
-using Application.NaqelAgent.Queries.Students.GetPage;
-using Application.NaqelAgent.Queries.Students.GetStudentMetaData;
+using Application.Agent.Queries.GetAgentVersion;
+using Application.Agent.Queries.GetDynamicQueryData;
+using Application.Agent.Queries.Students.GetPage;
+using Application.Agent.Queries.Students.GetStudentMetaData;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace API.Controllers;
 

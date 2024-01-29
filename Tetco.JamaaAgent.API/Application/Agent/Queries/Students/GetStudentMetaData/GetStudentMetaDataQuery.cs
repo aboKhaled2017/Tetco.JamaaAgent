@@ -2,9 +2,9 @@
 using Domain.Common.Patterns;
 using Domain.Common.Settings;
 
-namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
+namespace Application.Agent.Queries.Students.GetStudentMetaData
 {
-    public sealed record GetStudentsMetaDataRes(string InstituteCode,string AgentVersion, IEnumerable<ViewsMetaData> ViewsMetaData);
+    public sealed record GetStudentsMetaDataRes(string InstituteCode, string AgentVersion, IEnumerable<ViewsMetaData> ViewsMetaData);
     public sealed class GetAgentMetaDataQuery : IRequest<Result<GetStudentsMetaDataRes>>
     {
         public string SchemaName { get; set; }
@@ -17,21 +17,21 @@ namespace Application.NaqelAgent.Queries.Students.GetStudentMetaData
         private readonly IStudentQuery _db;
         private readonly GeneralSetting _generalSetting;
 
-        public GetStudentsMetaDataQueryHandler(IStudentQuery db , GeneralSetting generalSetting)
+        public GetStudentsMetaDataQueryHandler(IStudentQuery db, GeneralSetting generalSetting)
         {
             _db = db;
             _generalSetting = generalSetting;
         }
         public async Task<Result<GetStudentsMetaDataRes>> Handle(GetAgentMetaDataQuery request, CancellationToken cancellationToken)
         {
-            var result = await _db.GetColumnInformation(request.SchemaName,request.Views);
+            var result = await _db.GetColumnInformation(request.SchemaName, request.Views);
             return Result<GetStudentsMetaDataRes>.Success("data retreived successfully")
-                .WithData(new(_generalSetting.InstituteCode,_generalSetting.AgentVersion,result));
+                .WithData(new(_generalSetting.InstituteCode, _generalSetting.AgentVersion, result));
 
         }
 
     }
 
-    public record ViewsMetaData(string ViewName,dynamic ColumnInformation, long TotalCount, DateTime? LastBatchUpdate);
+    public record ViewsMetaData(string ViewName, dynamic ColumnInformation, long TotalCount, DateTime? LastBatchUpdate);
 
 }

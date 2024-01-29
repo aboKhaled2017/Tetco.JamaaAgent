@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Domain.Common.Patterns;
 
-namespace Application.NaqelAgent.Queries.Students.GetPage
+namespace Application.Agent.Queries.Students.GetPage
 {
     public sealed record GetPageOfStudentRes(IEnumerable<ViewDetail> ViewDetails);
     public sealed class GetPageOfStudentQuery : IRequest<Result<GetPageOfStudentRes>>
@@ -30,7 +30,7 @@ namespace Application.NaqelAgent.Queries.Students.GetPage
 
         public async Task<Result<GetPageOfStudentRes>> Handle(GetPageOfStudentQuery request, CancellationToken cancellationToken)
         {
-            var students = await _db.GetAllAsync(request.PageSize, request.PageNumber,request.SchemaName,request.MasterView, request.RelatedViews, request.AssociationColumnName,request.ColumnNameFilter,request.From,request.To);
+            var students = await _db.GetAllAsync(request.PageSize, request.PageNumber, request.SchemaName, request.MasterView, request.RelatedViews, request.AssociationColumnName, request.ColumnNameFilter, request.From, request.To);
             return Result<GetPageOfStudentRes>.Success("data retreived successfully")
                 .WithData(new(students));
         }

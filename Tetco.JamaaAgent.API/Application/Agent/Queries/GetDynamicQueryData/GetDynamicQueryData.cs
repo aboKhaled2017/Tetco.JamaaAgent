@@ -2,7 +2,7 @@
 using Domain.Common.Patterns;
 using Domain.Enums;
 
-namespace Application.NaqelAgent.Queries.Agent.GetDynamicQueryData
+namespace Application.Agent.Queries.GetDynamicQueryData
 {
     public sealed record GetDynamicQueryDataRes(IEnumerable<ViewDynamicData> ViewsMetaData);
     public sealed class GetDynamicQueryDataReq : IRequest<Result<GetDynamicQueryDataRes>>

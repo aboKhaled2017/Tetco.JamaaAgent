@@ -1,4 +1,4 @@
-﻿using Application.NaqelAgent.Queries.Agent.GetDynamicQueryData;
+﻿using Application.Agent.Queries.GetDynamicQueryData;
 using Domain.Enums;
 
 namespace Application.Common.Interfaces

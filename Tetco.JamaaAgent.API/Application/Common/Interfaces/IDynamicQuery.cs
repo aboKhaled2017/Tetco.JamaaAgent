@@ -1,4 +1,4 @@
-﻿using Application.NaqelAgent.Queries.Agent.GetDynamicQueryData;
+﻿using Application.Agent.Queries.GetDynamicQueryData;
 
 namespace Application.Common.Interfaces
 {

@@ -1,7 +1,7 @@
 ﻿using Domain.Common.Patterns;
 using Domain.Common.Settings;
 
-namespace Application.NaqelAgent.Queries.Agent.GetAgentVersion
+namespace Application.Agent.Queries.GetAgentVersion
 {
     public sealed record GetAgentVersionRes(string Version);
     public sealed class GetAgentVersionReq : IRequest<Result<GetAgentVersionRes>>
