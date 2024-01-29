@@ -1,4 +1,4 @@
-﻿using Application.NaqelAgent.Queries.Students.GetDynamicQueryData;
+﻿using Application.NaqelAgent.Queries.Agent.GetDynamicQueryData;
 
 namespace Application.Common.Interfaces
 {

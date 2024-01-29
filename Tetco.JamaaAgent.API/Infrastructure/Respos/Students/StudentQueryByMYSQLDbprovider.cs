@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces;
-using Application.NaqelAgent.Queries.Students.GetDynamicQueryData;
+using Application.NaqelAgent.Queries.Agent.GetDynamicQueryData;
 using Application.NaqelAgent.Queries.Students.GetPage;
 using Application.NaqelAgent.Queries.Students.GetStudentMetaData;
 using Dapper;

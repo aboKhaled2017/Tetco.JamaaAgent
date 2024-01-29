@@ -1,8 +1,10 @@
 ﻿using API.CrossCuttings.Authorization;
-using Application.NaqelAgent.Queries.Students.GetDynamicQueryData;
+using Application.NaqelAgent.Queries.Agent.GetAgentVersion;
+using Application.NaqelAgent.Queries.Agent.GetDynamicQueryData;
 using Application.NaqelAgent.Queries.Students.GetPage;
 using Application.NaqelAgent.Queries.Students.GetStudentMetaData;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace API.Controllers;
 
@@ -38,5 +40,11 @@ public sealed class AgentController : ApiControllerBase
     {
 
         return Ok("works fine");
+    }
+
+    [HttpGet("getAgentVersion")]
+    public async Task<IActionResult> GetAgentVersion(GetAgentVersionReq request)
+    {
+        return Ok(await Mediator.Send(request));
     }
 }

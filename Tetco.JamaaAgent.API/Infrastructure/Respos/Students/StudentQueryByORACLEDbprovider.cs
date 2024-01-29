@@ -5,7 +5,7 @@ using Oracle.ManagedDataAccess.Client;
 using Application.Common.Interfaces;
 using Application.NaqelAgent.Queries.Students.GetStudentMetaData;
 using Application.NaqelAgent.Queries.Students.GetPage;
-using Application.NaqelAgent.Queries.Students.GetDynamicQueryData;
+using Application.NaqelAgent.Queries.Agent.GetDynamicQueryData;
 
 namespace Infrastructure.Respos.Students
 {

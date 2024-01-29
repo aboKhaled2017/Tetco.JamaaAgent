@@ -4,9 +4,9 @@ using System.Text;
 using Oracle.ManagedDataAccess.Client;
 using Application.Common.Interfaces;
 using Application.NaqelAgent.Queries.Students.GetPage;
-using Application.NaqelAgent.Queries.Students.GetDynamicQueryData;
 using Domain.Enums;
 using Infrastructure.Utilities;
+using Application.NaqelAgent.Queries.Agent.GetDynamicQueryData;
 
 namespace Infrastructure.Respos.Dynamic
 {

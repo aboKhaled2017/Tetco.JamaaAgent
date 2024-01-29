@@ -2,7 +2,7 @@
 using Domain.Common.Patterns;
 using Domain.Enums;
 
-namespace Application.NaqelAgent.Queries.Students.GetDynamicQueryData
+namespace Application.NaqelAgent.Queries.Agent.GetDynamicQueryData
 {
     public sealed record GetDynamicQueryDataRes(IEnumerable<ViewDynamicData> ViewsMetaData);
     public sealed class GetDynamicQueryDataReq : IRequest<Result<GetDynamicQueryDataRes>>
@@ -22,16 +22,16 @@ namespace Application.NaqelAgent.Queries.Students.GetDynamicQueryData
         {
             _defineProvider = defineProvider;
         }
-       
+
         public async Task<Result<GetDynamicQueryDataRes>> Handle(GetDynamicQueryDataReq request, CancellationToken cancellationToken)
         {
-            var result = await _defineProvider.GetDynamicInformation(request.QueryStr, request.Parameters, request.NoOfQueries, request.Provider,request.SchemaType);
+            var result = await _defineProvider.GetDynamicInformation(request.QueryStr, request.Parameters, request.NoOfQueries, request.Provider, request.SchemaType);
             return Result<GetDynamicQueryDataRes>.Success("data retreived successfully")
                 .WithData(new(result));
 
         }
 
-        
+
     }
 
     public record ViewDynamicData(string QueryName, dynamic Data, int TotalCount);
