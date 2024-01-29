@@ -29,10 +29,16 @@ namespace Application.AgentLogs.Queries.GetAgentLogs
                 var logEntries = _logReader.ReadLogs(request.Date);
                 return Result<GetAgentLogsRes>.Success("Data retrieved successfully").WithData(new GetAgentLogsRes(logEntries.ToList()));
             }
+            
             catch (FileNotFoundException ex)
             {
                 _logger.LogInformation(ex.Message);
                 return Result<GetAgentLogsRes>.Failure("404", ex.Message).WithData(new GetAgentLogsRes(new List<LogEntry>()));
+            }
+            catch (IOException ex)
+            {
+                _logger.LogInformation(ex.Message);
+                return Result<GetAgentLogsRes>.Failure("500", ex.Message).WithData(new GetAgentLogsRes(new List<LogEntry>()));
             }
             catch (JsonException ex)
             {
