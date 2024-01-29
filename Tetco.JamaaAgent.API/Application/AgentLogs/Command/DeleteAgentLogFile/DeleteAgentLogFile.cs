@@ -1,12 +1,12 @@
 ﻿using Domain.Common.Patterns;
 using Microsoft.Extensions.Logging;
 
-namespace Application.AgentLogs.Queries.DeleteAgentLogFile
+namespace Application.AgentLogs.Command.DeleteAgentLogFile
 {
     public sealed record DeleteAgentLogFileRes(bool IsDeleted);
     public sealed class DeleteAgentLogFileReq : IRequest<Result<DeleteAgentLogFileRes>>
     {
-       public DateOnly Date { get; set; }
+        public DateOnly Date { get; set; }
     }
     public sealed class DeleteAgentLogFileHandler : IRequestHandler<DeleteAgentLogFileReq, Result<DeleteAgentLogFileRes>>
     {

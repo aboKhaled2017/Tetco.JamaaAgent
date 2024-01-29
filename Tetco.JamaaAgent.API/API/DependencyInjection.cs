@@ -12,7 +12,7 @@ public static class DependencyInjection
 
         services.AddSingleton<IAgentApiKeyValidator, AgentApiKeyValidator>();
         services.AddScoped<AgentApiKeyAuthorizationFilter>();
-
+        services.AddSingleton<RequestResponseLoggingMiddleware>();
         services.AddTransient<JamaaAgentExceptionMiddleWare>();
 
 
