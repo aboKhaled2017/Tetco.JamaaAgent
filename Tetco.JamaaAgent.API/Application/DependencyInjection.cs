@@ -22,7 +22,8 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehaviour<,>));
         });
         services.AddTransient<ISerializer, NewtonsoftJsonSerializer>();
-        services.AddTransient<Application.Common.Utilities.Helper>();
+        services.AddScoped<Common.Utilities.LogReader>();
+        services.AddScoped<Common.Utilities.LogDeleter>();
 
 
 

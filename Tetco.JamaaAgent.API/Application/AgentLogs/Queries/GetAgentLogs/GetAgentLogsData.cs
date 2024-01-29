@@ -2,7 +2,7 @@
 using Application.Common.Utilities;
 using Domain.Common.Patterns;
 using Microsoft.Extensions.Logging;
-using System.Globalization;
+using Newtonsoft.Json;
 
 namespace Application.AgentLogs.Queries.GetAgentLogs
 {
@@ -14,26 +14,37 @@ namespace Application.AgentLogs.Queries.GetAgentLogs
     public sealed class GetAgentLogsHandler : IRequestHandler<GetAgentLogsReq, Result<GetAgentLogsRes>>
     {
         ILogger<GetAgentLogsHandler> _logger;
-        private readonly Helper _helper;
+        private readonly LogReader _logReader;
 
-        public GetAgentLogsHandler(ILogger<GetAgentLogsHandler> logger, Helper helper)
+        public GetAgentLogsHandler(ILogger<GetAgentLogsHandler> logger, LogReader logReader)
         {
-            _logger = logger;
-            _helper = helper;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logReader = logReader ?? throw new ArgumentNullException(nameof(logReader));
         }
 
         public async Task<Result<GetAgentLogsRes>> Handle(GetAgentLogsReq request, CancellationToken cancellationToken)
         {
-            Task.CompletedTask.Wait();
             try
             {
-                return _helper.GetLogsByDate(request.Date,_logger);
-               
+                var logEntries = _logReader.ReadLogs(request.Date);
+                return Result<GetAgentLogsRes>.Success("Data retrieved successfully").WithData(new GetAgentLogsRes(logEntries.ToList()));
+            }
+            catch (FileNotFoundException ex)
+            {
+                _logger.LogInformation(ex.Message);
+                return Result<GetAgentLogsRes>.Failure("404", ex.Message).WithData(new GetAgentLogsRes(new List<LogEntry>()));
+            }
+            catch (JsonException ex)
+            {
+                var errorDes = $"Error deserializing JSON. Error: {ex.Message}";
+                _logger.LogError(errorDes);
+                return Result<GetAgentLogsRes>.Failure("500", errorDes).WithData(new GetAgentLogsRes(new List<LogEntry>()));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving agent logs");
-                return Result<GetAgentLogsRes>.Failure("500", "Internal Server Error");
+                var errorDes = $"Unexpected error: {ex.Message}";
+                _logger.LogError(errorDes);
+                return Result<GetAgentLogsRes>.Failure("500", errorDes).WithData(new GetAgentLogsRes(new List<LogEntry>()));
             }
         }
 
