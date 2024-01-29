@@ -8,7 +8,7 @@ namespace Application.AgentLogs.Queries.GetAgentLogs
     public sealed record GetAgentLogsRes(IEnumerable<LogEntry> Logs);
     public sealed class GetAgentLogsReq : IRequest<Result<GetAgentLogsRes>>
     {
-       public DateOnly dateOnly { get; }
+       public DateOnly Date { get; set; }
     }
     public sealed class GetAgentLogsHandler : IRequestHandler<GetAgentLogsReq, Result<GetAgentLogsRes>>
     {
@@ -20,14 +20,15 @@ namespace Application.AgentLogs.Queries.GetAgentLogs
 
         public async Task<Result<GetAgentLogsRes>> Handle(GetAgentLogsReq request, CancellationToken cancellationToken)
         {
+            Task.CompletedTask.Wait();
             try
             {
-                string logFileName = $"log-{request.dateOnly:yyyy-MM-dd}.txt";
+                string logFileName = $"log-{request.Date:yyyy-MM-dd}.txt";
                 string logFilePath = Path.Combine("logs", logFileName);
 
                 if (!File.Exists(logFilePath))
                 {
-                    _logger.LogInformation($"Log file not found for {request.dateOnly:yyyy-MM-dd}");
+                    _logger.LogInformation($"Log file not found for {request.Date:yyyy-MM-dd}");
                     return Result<GetAgentLogsRes>.Failure("404", "File not found").WithData(new GetAgentLogsRes(new List<LogEntry>()));
                 }
 

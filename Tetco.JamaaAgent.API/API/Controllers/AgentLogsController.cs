@@ -1,4 +1,5 @@
 ﻿using API.CrossCuttings.Authorization;
+using Application.AgentLogs.Queries.DeleteAgentLogFile;
 using Application.AgentLogs.Queries.GetAgentLogs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,10 +11,19 @@ namespace API.Controllers;
 public sealed class AgentLogsController : ApiControllerBase
 {
 
-    [HttpPost("getAgentLogsByDate")]
-    public async Task<IActionResult> GetAgentLogsByDate(GetAgentLogsReq request)
+
+    [HttpGet("{date}")]
+    public async Task<IActionResult> GetLogs(DateOnly date)
     {
-        return Ok(await Mediator.Send(request));
+        var logs = await Mediator.Send(new GetAgentLogsReq { Date = date });
+        return Ok(logs);
+    }
+
+    [HttpDelete("{date}")]
+    public async Task<IActionResult> DeleteLogs(DateOnly date)
+    {
+        var result= await Mediator.Send(new DeleteAgentLogFileReq { Date = date });
+        return Ok(result);
     }
 
 }
