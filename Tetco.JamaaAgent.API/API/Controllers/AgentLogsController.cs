@@ -34,7 +34,7 @@ public sealed class AgentLogsController : ApiControllerBase
         return Ok(result);
     }
 
-    [HttpGet("getLogsFiles")]
+    [HttpPost("getLogsFiles")]
     public async Task<IActionResult> GetLogsFiles(GetAgentLogsFilesReq req)
     {
         if (req.StartDate == DateOnly.MinValue || req.EndDate == DateOnly.MinValue)
