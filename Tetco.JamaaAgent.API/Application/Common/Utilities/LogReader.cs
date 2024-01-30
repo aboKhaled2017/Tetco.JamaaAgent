@@ -22,7 +22,7 @@ namespace Application.Common.Utilities
                 {
                     dynamic logEntry = JsonConvert.DeserializeObject(jsonEntry);
 
-                    string timestamp = logEntry["@t"];
+                    string timestamp = logEntry["@t"] ?? string.Empty;
                     string level = logEntry["@l"] ?? string.Empty;
                     string exception = logEntry["@mt"] ?? string.Empty;
                     string applicationName = logEntry["Application"] ?? string.Empty;

@@ -1,7 +1,7 @@
 ﻿using API.CrossCuttings.Authorization;
 using Application.AgentLogs.Command.DeleteAgentLogsFile;
 using Application.AgentLogs.Command.DeleteAgentLogsFiles;
-using Application.AgentLogs.Queries.GetAgentLogsFileFile;
+using Application.AgentLogs.Queries.GetAgentLogsFile;
 using Application.AgentLogs.Queries.GetAgentLogsFiles;
 using Microsoft.AspNetCore.Mvc;
 

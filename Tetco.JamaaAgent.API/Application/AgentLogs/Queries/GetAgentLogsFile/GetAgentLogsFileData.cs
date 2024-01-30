@@ -4,7 +4,7 @@ using Domain.Common.Patterns;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace Application.AgentLogs.Queries.GetAgentLogsFileFile
+namespace Application.AgentLogs.Queries.GetAgentLogsFile
 {
     public sealed record GetAgentLogsFileRes(IEnumerable<LogEntry> Logs);
     public sealed class GetAgentLogsFileReq : IRequest<Result<GetAgentLogsFileRes>>

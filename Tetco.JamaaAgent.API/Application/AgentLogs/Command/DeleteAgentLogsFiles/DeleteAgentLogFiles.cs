@@ -25,7 +25,10 @@ namespace Application.AgentLogs.Command.DeleteAgentLogsFiles
         {
             try
             {
-                _logDeleter.DeleteLogsInRange(request.StartDate, request.EndDate);
+                var result = _logDeleter.DeleteLogsInRange(request.StartDate, request.EndDate);
+                if (result.All(x => x.IsDeleted == false))
+                    return Result<DeleteAgentLogsFilesRes>.Failure("404", string.Concat(result.Select(s => $"{s.Message} , " )).TrimEnd(' ', ',')).WithData(new DeleteAgentLogsFilesRes(false));
+
                 _logger.LogInformation($"Agent log file deleted for date range: {request.StartDate:yyyy-MM-dd} - {request.EndDate:yyyy-MM-dd}");
                 return Result<DeleteAgentLogsFilesRes>.Success("Agent log file deleted successfully").WithData(new DeleteAgentLogsFilesRes(true));
             }
