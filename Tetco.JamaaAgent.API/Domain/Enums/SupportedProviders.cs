@@ -11,3 +11,9 @@ public enum SchemaType
     Student = 1,
     Employee = 2,
 }
+
+public enum AgentErrorType
+{
+    Business = 1,
+    Technical = 2,
+}

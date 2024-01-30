@@ -1,4 +1,6 @@
-﻿namespace Domain.Common.Patterns;
+﻿using Domain.Enums;
+
+namespace Domain.Common.Patterns;
 
 public class Result : Result<object>
 {
@@ -6,28 +8,30 @@ public class Result : Result<object>
     {
 
     }
-    internal Result(bool succeeded, IDictionary<string, string[]> errors, string message = null) : base(succeeded, errors, message)
+    internal Result(bool succeeded, IDictionary<string, string[]> errors, string message = null, AgentErrorType errorType = AgentErrorType.Technical) : base(succeeded, errors, message,errorType)
     {
     }
 
-    public static Result Success(string message = null)
+    public static Result Success(string message = null,AgentErrorType errorType = AgentErrorType.Technical)
     {
         return new Result(true, null)
         {
-            Message = message
+            Message = message,
+            ErrorType = errorType.ToString()
         };
     }
-    public static Result Failure(string errorCode, string errorMessage)
+    public static Result Failure(string errorCode, string errorMessage,AgentErrorType errorType= AgentErrorType.Technical)
     {
-        return new Result(false, new Dictionary<string, string[]>())
+        return new Result(false, new Dictionary<string, string[]>() )
         {
             Code = errorCode,
-            Message = errorMessage
+            Message = errorMessage,
+            ErrorType = errorType.ToString()
         };
     }
-    public static Result Failure(string errorCode, IDictionary<string, string[]> errors, string message = null)
+    public static Result Failure(string errorCode, IDictionary<string, string[]> errors, string message = null, AgentErrorType errorType = AgentErrorType.Technical)
     {
-        return new Result(false, errors,message)
+        return new Result(false, errors,message,errorType)
         {
             Code = errorCode
         };
@@ -39,11 +43,12 @@ public class Result<TData>
     {
 
     }
-    internal Result(bool succeeded, IDictionary<string, string[]> errors, string message = null)
+    internal Result(bool succeeded, IDictionary<string, string[]> errors, string message = null, AgentErrorType errorType=AgentErrorType.Technical)
     {
         Succeeded = succeeded;
         Errors = errors;
         Message = message;
+        ErrorType = errorType.ToString();
     }
 
     public bool Succeeded
@@ -56,23 +61,26 @@ public class Result<TData>
     }
     public string Message { get; set; }
     public string Code { get; set; }
+    public string ErrorType { get; set; }
 
-    public static Result<TData> Success(string message = null)
+    public static Result<TData> Success(string message = null,AgentErrorType errorType= AgentErrorType.Technical)
     {
         return new Result<TData>(true,null)
         {
-            Message = message
+            Message = message,
+            ErrorType = errorType.ToString()
         };
     }
-    public static Result<TData> Failure(string errorCode, string errorMessage)
+    public static Result<TData> Failure(string errorCode, string errorMessage, AgentErrorType errorType=AgentErrorType.Technical)
     {
         return new Result<TData>(false,new Dictionary<string, string[]>())
         {
             Code = errorCode,
-            Message = errorMessage
+            Message = errorMessage,
+            ErrorType = errorType.ToString()
         };
     }
-    public static Result<TData> Failure(string errorCode, IDictionary<string, string[]> errors)
+    public static Result<TData> Failure(string errorCode, IDictionary<string, string[]> errors, AgentErrorType errorType = AgentErrorType.Technical)
     {
         return new Result<TData>(false, errors)
         {

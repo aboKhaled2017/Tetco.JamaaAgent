@@ -1,6 +1,9 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.AgentLogs.Queries.GetAgentLogsFiles;
+using Application.Common.Interfaces;
+using Domain.Common.Constants;
 using Domain.Common.Patterns;
 using Domain.Enums;
+using MySqlX.XDevAPI.Common;
 
 namespace Application.Agent.Queries.GetDynamicQueryData
 {
@@ -25,9 +28,17 @@ namespace Application.Agent.Queries.GetDynamicQueryData
 
         public async Task<Result<GetDynamicQueryDataRes>> Handle(GetDynamicQueryDataReq request, CancellationToken cancellationToken)
         {
-            var result = await _defineProvider.GetDynamicInformation(request.QueryStr, request.Parameters, request.NoOfQueries, request.Provider, request.SchemaType);
-            return Result<GetDynamicQueryDataRes>.Success("data retreived successfully")
-                .WithData(new(result));
+            try
+            {
+                var result = await _defineProvider.GetDynamicInformation(request.QueryStr, request.Parameters, request.NoOfQueries, request.Provider, request.SchemaType);
+                return Result<GetDynamicQueryDataRes>.Success("data retreived successfully")
+                    .WithData(new(result));
+            }
+            catch (Exception ex)
+            {
+                return Result<GetDynamicQueryDataRes>.Failure("500", ex.Message).WithData(new GetDynamicQueryDataRes(new List<ViewDynamicData>()));
+            }
+          
 
         }
 

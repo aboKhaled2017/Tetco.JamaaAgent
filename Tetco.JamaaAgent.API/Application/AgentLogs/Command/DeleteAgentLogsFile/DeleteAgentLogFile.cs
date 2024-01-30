@@ -1,5 +1,6 @@
 ﻿using Application.Common.Utilities;
 using Domain.Common.Patterns;
+using Domain.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace Application.AgentLogs.Command.DeleteAgentLogsFile
@@ -31,7 +32,7 @@ namespace Application.AgentLogs.Command.DeleteAgentLogsFile
             catch (FileNotFoundException ex)
             {
                 _logger.LogWarning(ex.Message);
-                return Result<DeleteAgentLogsFileRes>.Failure("404", ex.Message).WithData(new DeleteAgentLogsFileRes(false));
+                return Result<DeleteAgentLogsFileRes>.Failure("404", ex.Message,errorType:AgentErrorType.Business).WithData(new DeleteAgentLogsFileRes(false));
             }
             catch (Exception ex)
             {

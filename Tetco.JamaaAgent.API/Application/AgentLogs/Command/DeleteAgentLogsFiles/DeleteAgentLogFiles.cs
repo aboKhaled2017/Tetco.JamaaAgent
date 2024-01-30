@@ -1,5 +1,6 @@
 ﻿using Application.Common.Utilities;
 using Domain.Common.Patterns;
+using Domain.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace Application.AgentLogs.Command.DeleteAgentLogsFiles
@@ -27,7 +28,7 @@ namespace Application.AgentLogs.Command.DeleteAgentLogsFiles
             {
                 var result = _logDeleter.DeleteLogsInRange(request.StartDate, request.EndDate);
                 if (result.All(x => x.IsDeleted == false))
-                    return Result<DeleteAgentLogsFilesRes>.Failure("404", string.Concat(result.Select(s => $"{s.Message} , " )).TrimEnd(' ', ',')).WithData(new DeleteAgentLogsFilesRes(false));
+                    return Result<DeleteAgentLogsFilesRes>.Failure("404", string.Concat(result.Select(s => $"{s.Message} , " )).TrimEnd(' ', ','), errorType: AgentErrorType.Business).WithData(new DeleteAgentLogsFilesRes(false));
 
                 _logger.LogInformation($"Agent log file deleted for date range: {request.StartDate:yyyy-MM-dd} - {request.EndDate:yyyy-MM-dd}");
                 return Result<DeleteAgentLogsFilesRes>.Success("Agent log file deleted successfully").WithData(new DeleteAgentLogsFilesRes(true));
@@ -35,7 +36,7 @@ namespace Application.AgentLogs.Command.DeleteAgentLogsFiles
             catch (FileNotFoundException ex)
             {
                 _logger.LogWarning(ex.Message);
-                return Result<DeleteAgentLogsFilesRes>.Failure("404", ex.Message).WithData(new DeleteAgentLogsFilesRes(false));
+                return Result<DeleteAgentLogsFilesRes>.Failure("404", ex.Message, errorType: AgentErrorType.Business).WithData(new DeleteAgentLogsFilesRes(false));
             }
             catch (Exception ex)
             {

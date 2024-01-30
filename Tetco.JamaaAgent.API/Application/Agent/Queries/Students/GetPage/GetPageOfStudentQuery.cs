@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Agent.Queries.GetDynamicQueryData;
+using Application.Common.Interfaces;
 using Domain.Common.Patterns;
 
 namespace Application.Agent.Queries.Students.GetPage
@@ -30,9 +31,19 @@ namespace Application.Agent.Queries.Students.GetPage
 
         public async Task<Result<GetPageOfStudentRes>> Handle(GetPageOfStudentQuery request, CancellationToken cancellationToken)
         {
-            var students = await _db.GetAllAsync(request.PageSize, request.PageNumber, request.SchemaName, request.MasterView, request.RelatedViews, request.AssociationColumnName, request.ColumnNameFilter, request.From, request.To);
-            return Result<GetPageOfStudentRes>.Success("data retreived successfully")
-                .WithData(new(students));
+            try
+            {
+                var students = await _db.GetAllAsync(request.PageSize, request.PageNumber, request.SchemaName, request.MasterView, request.RelatedViews, request.AssociationColumnName, request.ColumnNameFilter, request.From, request.To);
+                return Result<GetPageOfStudentRes>.Success("data retreived successfully")
+                    .WithData(new(students));
+            }
+           
+            catch (Exception ex)
+            {
+                return Result<GetPageOfStudentRes>.Failure("500", ex.Message).WithData(new GetPageOfStudentRes(new List<ViewDetail>()));
+            }
+        
+            
         }
 
     }

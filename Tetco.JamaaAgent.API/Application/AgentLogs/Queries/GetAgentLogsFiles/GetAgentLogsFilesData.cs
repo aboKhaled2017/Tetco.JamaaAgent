@@ -1,6 +1,7 @@
 ﻿using Application.Common.Models;
 using Application.Common.Utilities;
 using Domain.Common.Patterns;
+using Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -34,7 +35,7 @@ namespace Application.AgentLogs.Queries.GetAgentLogsFiles
             catch (FileNotFoundException ex)
             {
                 _logger.LogInformation(ex.Message);
-                return Result<GetAgentLogsFilesRes>.Failure("404", ex.Message).WithData(new GetAgentLogsFilesRes(new List<LogEntry>()));
+                return Result<GetAgentLogsFilesRes>.Failure("404", ex.Message, errorType: AgentErrorType.Business).WithData(new GetAgentLogsFilesRes(new List<LogEntry>()));
             }
             catch (IOException ex)
             {

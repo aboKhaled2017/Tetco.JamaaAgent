@@ -24,9 +24,16 @@ namespace Application.Agent.Queries.Students.GetStudentMetaData
         }
         public async Task<Result<GetStudentsMetaDataRes>> Handle(GetAgentMetaDataQuery request, CancellationToken cancellationToken)
         {
-            var result = await _db.GetColumnInformation(request.SchemaName, request.Views);
-            return Result<GetStudentsMetaDataRes>.Success("data retreived successfully")
-                .WithData(new(_generalSetting.InstituteCode, _generalSetting.AgentVersion, result));
+            try
+            {
+                var result = await _db.GetColumnInformation(request.SchemaName, request.Views);
+                return Result<GetStudentsMetaDataRes>.Success("data retreived successfully")
+                    .WithData(new(_generalSetting.InstituteCode, _generalSetting.AgentVersion, result));
+            }
+            catch (Exception ex)
+            {
+                return Result<GetStudentsMetaDataRes>.Failure("500", ex.Message).WithData(new GetStudentsMetaDataRes(string.Empty,string.Empty,new List<ViewsMetaData>()));
+            }
 
         }
 
